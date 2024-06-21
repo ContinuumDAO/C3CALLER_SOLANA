@@ -2,13 +2,13 @@ use crate::*;
 
 #[event]
 pub struct LogC3Call{
-    dapp_id:u128,
-    uuid: [u8;32],
-    caller:Pubkey,
-    to_chain_id:String,
-    to:String,
-    data:Vec<u8>,
-    extra: Vec<u8>
+    pub dapp_id:u128,
+    pub uuid: [u8;32],
+    pub caller:Pubkey,
+    pub to_chain_id:String,
+    pub to:String,
+    pub data:Vec<u8>,
+    pub extra: Option<Vec<u8>>
 }
 
 #[event]
@@ -22,26 +22,25 @@ pub struct LogFallbackCall{
 
 #[event]
 pub struct LogExecCall{
-    dapp_id:u128,
-    to:String,
-    uuid: [u8;32],
-    from_chain_id:String,
-    source_tx:String,
-    data:Vec<u8>,
-    success:bool,
-    reason: Vec<u8>
+    pub dapp_id:u128,
+    pub to:String,
+    pub uuid: [u8;32],
+    pub from_chain_id:String,
+    pub source_tx:String,
+    pub data:Vec<u8>,
+    pub success:bool,
+    pub reason: Vec<u8>
 }
 
 #[event]
 pub struct LogExecFallback{
-    dapp_id:u128,
-    to:String,
-    uuid: [u8;32],
-    from_chain_id:String,
-    source_tx:String,
-    data:Vec<u8>,
-    success:bool,
-    reason: Vec<u8>
+    pub dapp_id:u128,
+    pub to:String,
+    pub uuid: [u8;32],
+    pub from_chain_id:String,
+    pub source_tx:String,
+    pub data:Vec<u8>,
+    pub reason: Vec<u8>
 }
 
 
