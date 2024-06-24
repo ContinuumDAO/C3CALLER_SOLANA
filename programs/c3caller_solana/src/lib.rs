@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 mod errors;
 mod events;
 mod states;
+mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
@@ -10,6 +11,7 @@ declare_id!("2hFPiv6jk5sEF6gai3v1q76oUQXPnghVNJF3GqwdN1hh");
 #[program]
 pub mod c3caller_solana {
     use states::C3EvmMessage;
+    use utils::gen_uuid;
 
     use super::*;
 
@@ -25,7 +27,9 @@ pub mod c3caller_solana {
         require!(_to_chain_id.len()>0,C3CallerErros::ToChainIdisEmpty);
         require!(_data.len()>0,C3CallerErros::DataisEmpty);
 
-        let _uuid: [u8;32] =[0;32] ;
+
+        
+        let _uuid: [u8;32] = gen_uuid(ctx.accounts.signer.key(), ctx.program_id, nonce, _dapp_id, _to, _to_chain_id, _data) ;
 
         emit_cpi!(LogC3Call{
             dapp_id:_dapp_id,
@@ -86,7 +90,7 @@ pub mod c3caller_solana {
         });
         Ok(())
     }
-    pub fn c3Fallback(ctx: Context<Initialize>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3EvmMessage)-> Result<()>{
+    pub fn c3_fallback(ctx: Context<Initialize>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3EvmMessage)-> Result<()>{
     
         require!(_message.data.len()>0,C3CallerErros::DataisEmpty);
 
@@ -118,4 +122,10 @@ pub mod c3caller_solana {
 }
 #[event_cpi]
 #[derive(Accounts)]
-pub struct Initialize {}
+pub struct Initialize {
+    #[account(mut)]
+    pub c3_uuid : Account<'info, C3UUIDKeeper>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+}
