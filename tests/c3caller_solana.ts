@@ -36,8 +36,6 @@ describe("c3caller_solana", () => {
     const toChainId = 'chain1';
     const data = Buffer.from('some_data');
     const extra = Buffer.from('some_extra_data');
-
-    
     const listenerLogC3Call = program.addEventListener('LogC3Call', (event, slot) => {
       console.log(`slot ${slot} event value ${JSON.stringify(event)} `);
     });
@@ -47,9 +45,30 @@ describe("c3caller_solana", () => {
     }).rpc()
 
     await new Promise((resolve) => setTimeout(resolve, 5000));
-
     program.removeEventListener(listenerLogC3Call);
-
      console.log("Your transaction signature",tx);
    });
+
+   it("Should successfully call broadcast with valid inputs", async()=>{
+
+    const dappId = new anchor.BN(1);
+    const caller = provider.publicKey;
+    const to = ['9Jt8mC9HXvh2g5s3PbTsNU71RS9MXUbhEMEmLTixYirb','8Jt8mC9HXvh2g5s3PbTsNs71RS9MXUbhEMEmLTixYirv'];
+    const toChainId = ['chain1','chain2'];
+    const data = Buffer.from('some_data');
+    const listenerLogC3Call = program.addEventListener('LogC3Call', (event, slot) => {
+      console.log(`slot ${slot} event value ${JSON.stringify(event)} `);
+    });
+
+    const tx = await program.methods.c3Broadcast(dappId, caller, to, toChainId, data).accounts({
+      pause:pause, c3Uuid:c3uuidkeeper
+    }).rpc()
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    program.removeEventListener(listenerLogC3Call);
+     console.log("Your transaction signature",tx);
+   });
+
+
+
 });
