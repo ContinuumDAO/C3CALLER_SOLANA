@@ -11,7 +11,9 @@ pub enum C3CallerErros{
     #[msg("C3Caller: empty calldata")]
     DataisEmpty,
     #[msg("C3Caller: calldata length dismatch")]
-    CallDataLengthMismatch
+    CallDataLengthMismatch,
+    #[msg("C3Caller: contracted is paused")]
+    ContractIsPaused
 
 
 

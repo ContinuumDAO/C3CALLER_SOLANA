@@ -1,5 +1,5 @@
 use anchor_lang::solana_program::{keccak::hash, pubkey::Pubkey};
-pub fn gen_uuid(sender:Pubkey,program_id:Pubkey,nonce: u64,dapp_id:u128,to:String, to_chain_id:String, data:[u8;32])-> [u8;32]{
+pub fn gen_uuid(sender:Pubkey,program_id:Pubkey,nonce: u64,dapp_id:u128,to:String, to_chain_id:String, data:Vec<u8>)-> [u8;32]{
     hash(
         &[
             &sender.to_bytes()[..],

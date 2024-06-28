@@ -20,9 +20,14 @@ pub struct  C3Context{
 
 
 #[account]
+pub struct  Pause{
+    pub is_paused:bool
+}
+#[account]
+
 pub struct C3UUIDKeeper{
-    pub current_nonce: u64,
-    pub uuid_2_nonce: Vec<([u8; 32], u64)>,
+     pub current_nonce: u64,
+     uuid_2_nonce: [u8; 32],
 }
 
 impl C3UUIDKeeper {
