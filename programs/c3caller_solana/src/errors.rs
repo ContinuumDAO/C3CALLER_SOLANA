@@ -13,7 +13,9 @@ pub enum C3CallerErros{
     #[msg("C3Caller: calldata length dismatch")]
     CallDataLengthMismatch,
     #[msg("C3Caller: contracted is paused")]
-    ContractIsPaused
+    ContractIsPaused,
+    #[msg("C3Caller: not the owner")]
+    NotOwner
 
 
 

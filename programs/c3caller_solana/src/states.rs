@@ -23,6 +23,11 @@ pub struct  C3Context{
 pub struct  Pause{
     pub is_paused:bool
 }
+
+#[account]
+pub  struct OwnerKey{
+    pub onwer_key:Pubkey
+}
 #[account]
 
 pub struct C3UUIDKeeper{

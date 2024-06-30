@@ -11,7 +11,7 @@ declare_id!("EQPiEmWVmpkD53LfBahxY8gFaEiDzsjobLKuyxDmPHy9");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
-pub const SET_PAUSE_SEED:&[u8] = b"setpauseseed";
+pub const OWNER_KEY_SEED:&[u8] = b"ownerkeyseed";
 
 #[program]
 pub mod c_3caller_solana {
@@ -22,6 +22,7 @@ pub mod c_3caller_solana {
 
     pub fn initialize(ctx: Context<InitC3Caller>) -> Result<()> {
         ctx.accounts.pause.is_paused = false;
+        ctx.accounts.owner.onwer_key = ctx.accounts.signer.key();
         Ok(())
     }
 
@@ -79,7 +80,8 @@ pub mod c_3caller_solana {
         Ok(())
     }
 
-    pub fn execute(ctx: Context<InitC3Caller>, _dapp_id:u128, _tx_sender:String,_message:C3EvmMessage)-> Result<()>{
+    #[access_control(check_owner(&ctx))]
+    pub fn execute(ctx: Context<C3CallerState>, _dapp_id:u128, _tx_sender:String,_message:C3EvmMessage)-> Result<()>{
 
         require!(_message.data.len() >0,C3CallerErros::DataisEmpty);
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
@@ -98,7 +100,8 @@ pub mod c_3caller_solana {
         });
         Ok(())
     }
-    pub fn c3_fallback(ctx: Context<InitC3Caller>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3EvmMessage)-> Result<()>{
+    #[access_control(check_owner(&ctx))]
+    pub fn c3_fallback(ctx: Context<C3CallerState>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3EvmMessage)-> Result<()>{
     
         require!(_message.data.len()>0,C3CallerErros::DataisEmpty);
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
@@ -125,6 +128,7 @@ pub mod c_3caller_solana {
 
     }
 
+   
     pub fn set_pause_state(ctx: Context<SetPause>,_pause:bool)->Result<()>{
             msg!("Current state {}",ctx.accounts.pause.is_paused);
             ctx.accounts.pause.is_paused = _pause;
@@ -133,6 +137,15 @@ pub mod c_3caller_solana {
     }
 
 
+
+}
+
+fn check_owner(ctx: &Context<C3CallerState>)->Result<()>{
+    require_keys_eq!(
+        ctx.accounts.signer.key(),ctx.accounts.owner.onwer_key,C3CallerErros::NotOwner
+    );
+
+    Ok(())
 }
 #[event_cpi]
 #[derive(Accounts)]
@@ -150,6 +163,12 @@ pub struct InitC3Caller<'info> {
         bump
         )]
     pub pause:Account<'info,Pause>,
+    #[account(init,
+    payer = signer,
+    space = 32+8,
+    seeds = [OWNER_KEY_SEED],
+    bump)]
+    pub owner:Account<'info,OwnerKey>,
     #[account(mut)]
     pub signer: Signer<'info>,
     pub system_program:Program<'info,System>,
@@ -161,6 +180,8 @@ pub struct InitC3Caller<'info> {
 pub struct C3CallerState<'info>{
     #[account()]
     pub pause:Account<'info,Pause>,
+    #[account()]
+    pub owner:Account<'info,OwnerKey>,
     #[account(mut)]
     pub c3_uuid : Account<'info, C3UUIDKeeper>,
     #[account(mut)]
@@ -170,7 +191,15 @@ pub struct C3CallerState<'info>{
 #[derive(Accounts)]
 pub struct SetPause<'info>{
     #[account(mut,seeds=[PAUSE_SEED], bump)]
-    pub pause:Account<'info,Pause>
+    pub pause:Account<'info,Pause>,
+    signer:Signer<'info>,
 
+}
+
+#[derive(Accounts)]
+pub struct UpdateOwner<'info>{
+    #[account(mut,seeds=[OWNER_KEY_SEED], bump)]
+    owner:Account<'info,OwnerKey>,
+    signer:Signer<'info>,
 }
 
