@@ -11,17 +11,18 @@ describe("c3caller_solana", () => {
 
   const C3UUID_KEEPER_SEED = Buffer.from("c3uuidseed");
   const PAUSE_SEED = Buffer.from("pauseseed");
+  const SET_PAUSE_SEED = Buffer.from("setpauseseed");
   const [c3uuidkeeper,_bump] = anchor.web3.PublicKey.findProgramAddressSync(
     [C3UUID_KEEPER_SEED],
     program.programId
   );
 
 
-  const[pause, _bumps] = anchor.web3.PublicKey.findProgramAddressSync([PAUSE_SEED], program.programId)
 
   it("Is initialized!", async () => {
     
  
+    const[pause, _bumps] = anchor.web3.PublicKey.findProgramAddressSync([PAUSE_SEED], program.programId)
     const tx = await program.methods.initialize().accounts({ pause:pause, c3Uuid:c3uuidkeeper,
     })
     .rpc();
@@ -30,6 +31,8 @@ describe("c3caller_solana", () => {
 
   it("Should successfully call c3call with valid inputs", async()=>{
 
+
+  const[pause, _bumps] = anchor.web3.PublicKey.findProgramAddressSync([PAUSE_SEED], program.programId)
     const dappId = new anchor.BN(1);
     const caller = provider.publicKey;
     const to = '9Jt8mC9HXvh2g5s3PbTsNU71RS9MXUbhEMEmLTixYirb';
@@ -51,6 +54,7 @@ describe("c3caller_solana", () => {
 
    it("Should successfully call broadcast with valid inputs", async()=>{
 
+    const[pause, _bumps] = anchor.web3.PublicKey.findProgramAddressSync([PAUSE_SEED], program.programId)
     const dappId = new anchor.BN(1);
     const caller = provider.publicKey;
     const to = ['9Jt8mC9HXvh2g5s3PbTsNU71RS9MXUbhEMEmLTixYirb','8Jt8mC9HXvh2g5s3PbTsNs71RS9MXUbhEMEmLTixYirv'];
@@ -68,7 +72,16 @@ describe("c3caller_solana", () => {
     program.removeEventListener(listenerLogC3Call);
      console.log("Your transaction signature",tx);
    });
-
+   
+   it("contract pause", async()=> {
+    const[pause, _bumps] = anchor.web3.PublicKey.findProgramAddressSync([PAUSE_SEED], program.programId)
+    const t = await program.methods.setPauseState(true).accounts({
+      pause:pause
+    }).rpc()
+    const tx = await program.methods.setPauseState(false).accounts({
+      pause:pause
+    }).rpc()
+   })
 
 
 });

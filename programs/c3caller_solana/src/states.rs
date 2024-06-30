@@ -27,7 +27,7 @@ pub struct  Pause{
 
 pub struct C3UUIDKeeper{
      pub current_nonce: u64,
-     uuid_2_nonce: [u8; 32],
+     uuid_2_nonce: Vec<[u8; 32]>,
 }
 
 impl C3UUIDKeeper {

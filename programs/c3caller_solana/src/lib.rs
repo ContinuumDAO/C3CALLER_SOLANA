@@ -11,6 +11,7 @@ declare_id!("EQPiEmWVmpkD53LfBahxY8gFaEiDzsjobLKuyxDmPHy9");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
+pub const SET_PAUSE_SEED:&[u8] = b"setpauseseed";
 
 #[program]
 pub mod c_3caller_solana {
@@ -30,6 +31,7 @@ pub mod c_3caller_solana {
         require!(_to.len()>0, C3CallerErros::ToisEmpty);
         require!(_to_chain_id.len()>0,C3CallerErros::ToChainIdisEmpty);
         require!(_data.len()>0,C3CallerErros::DataisEmpty);
+        require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
 
 
         let nonce = ctx.accounts.c3_uuid.current_nonce+1;
@@ -80,6 +82,7 @@ pub mod c_3caller_solana {
     pub fn execute(ctx: Context<InitC3Caller>, _dapp_id:u128, _tx_sender:String,_message:C3EvmMessage)-> Result<()>{
 
         require!(_message.data.len() >0,C3CallerErros::DataisEmpty);
+        require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
        
        //TODO FINISH IMPLEMENTATION
         emit_cpi!(LogExecCall{
@@ -98,6 +101,7 @@ pub mod c_3caller_solana {
     pub fn c3_fallback(ctx: Context<InitC3Caller>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3EvmMessage)-> Result<()>{
     
         require!(_message.data.len()>0,C3CallerErros::DataisEmpty);
+        require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
             //TODO FINISH IMPLEMENTATION
        // emit_cpi!(LogExecFallback{})
        let context: C3Context = C3Context{
@@ -122,7 +126,9 @@ pub mod c_3caller_solana {
     }
 
     pub fn set_pause_state(ctx: Context<SetPause>,_pause:bool)->Result<()>{
+            msg!("Current state {}",ctx.accounts.pause.is_paused);
             ctx.accounts.pause.is_paused = _pause;
+            msg!("contract paused?: {}",_pause);
             Ok(())
     }
 
@@ -139,7 +145,7 @@ pub struct InitC3Caller<'info> {
     pub c3_uuid : Account<'info, C3UUIDKeeper>,
     #[account(init,
          payer = signer,
-          space = 8+1,
+        space = 8+1,
         seeds = [PAUSE_SEED],
         bump
         )]
@@ -153,7 +159,7 @@ pub struct InitC3Caller<'info> {
 #[event_cpi]
 #[derive(Accounts)]
 pub struct C3CallerState<'info>{
-    #[account(mut)]
+    #[account()]
     pub pause:Account<'info,Pause>,
     #[account(mut)]
     pub c3_uuid : Account<'info, C3UUIDKeeper>,
@@ -163,7 +169,7 @@ pub struct C3CallerState<'info>{
 
 #[derive(Accounts)]
 pub struct SetPause<'info>{
-    #[account(mut,seeds=[], bump)]
+    #[account(mut,seeds=[PAUSE_SEED], bump)]
     pub pause:Account<'info,Pause>
 
 }
