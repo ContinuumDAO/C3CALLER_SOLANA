@@ -15,6 +15,7 @@ pub const OWNER_KEY_SEED:&[u8] = b"ownerkeyseed";
 
 #[program]
 pub mod c_3caller_solana {
+    use anchor_lang::solana_program::{instruction::Instruction, program::invoke};
     use states::C3EvmMessage;
     use utils::gen_uuid;
 
@@ -81,23 +82,56 @@ pub mod c_3caller_solana {
     }
 
     #[access_control(check_owner(&ctx))]
-    pub fn execute(ctx: Context<C3CallerState>, _dapp_id:u128, _tx_sender:String,_message:C3EvmMessage)-> Result<()>{
+    pub fn execute(ctx: Context<C3CallerState>, _dapp_id:u128, _tx_sender:String,_message:C3EvmMessage, params:ExecuteParams)-> Result<()>{
 
         require!(_message.data.len() >0,C3CallerErros::DataisEmpty);
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
        
        //TODO FINISH IMPLEMENTATION
+
+
+       let mut accounts = Vec::with_capacity(params.accounts.len());
+
+       for acc in params.accounts.iter(){
+        accounts.push( AccountMeta::from(acc));
+           
+       }
+       let ix = Instruction{
+        program_id: params.program_id,
+        accounts: accounts,
+        data: params.data
+       };
+
+       let resutl = invoke(&ix, &[ctx.accounts.signer.to_account_info()]);
         emit_cpi!(LogExecCall{
             dapp_id:_dapp_id,
-            to:_message.to,
+            to:_message.to.clone(),
             uuid:_message.uuid,
             from_chain_id:_message.from_chain_id,
             source_tx:_message.source_tx,
-            data:_message.data,
+            data:_message.data.clone(),
             success:true,
             reason:Vec::new()
 
         });
+
+        match resutl {
+            Ok(_) => {
+                //save uiid 
+            },
+            Err(_) => {
+                emit!(LogFallbackCall{
+                   dapp_id:_dapp_id,
+                   to:_message.to,
+                   data:_message.data,
+                   uuid:_message.uuid,
+                   reasons:Vec::new()
+                }
+                    
+                )
+
+            },
+        }
         Ok(())
     }
     #[access_control(check_owner(&ctx))]
@@ -201,5 +235,35 @@ pub struct UpdateOwner<'info>{
     #[account(mut,seeds=[OWNER_KEY_SEED], bump)]
     owner:Account<'info,OwnerKey>,
     signer:Signer<'info>,
+}
+
+
+#[derive(Clone, AnchorSerialize, AnchorDeserialize)]
+pub struct ExecuteParams {
+    // target program to execute against
+    pub program_id: Pubkey,
+    // accounts required for the transaction
+    pub accounts: Vec<TransactionAccount>,
+    pub data: Vec<u8>,
+   
+   
+}
+
+
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct TransactionAccount {
+    pub pubkey: Pubkey,
+    pub is_signer: bool,
+    pub is_writable: bool,
+}
+
+impl From<&TransactionAccount> for AccountMeta {
+    fn from(account: &TransactionAccount) -> AccountMeta {
+        match account.is_writable {
+            false => AccountMeta::new_readonly(account.pubkey, account.is_signer),
+            true => AccountMeta::new(account.pubkey, account.is_signer),
+        }
+    }
 }
 
