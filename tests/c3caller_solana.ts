@@ -43,10 +43,12 @@ describe("c3caller_solana", () => {
       console.log(`slot ${slot} event value ${JSON.stringify(event)} `);
     });
 
+    
     const tx = await program.methods.c3Call(dappId, caller, to, toChainId, data, extra).accounts({
       pause:pause, c3Uuid:c3uuidkeeper
     }).rpc()
 
+    //const g = await program.methods.
     await new Promise((resolve) => setTimeout(resolve, 5000));
     program.removeEventListener(listenerLogC3Call);
      console.log("Your transaction signature",tx);
