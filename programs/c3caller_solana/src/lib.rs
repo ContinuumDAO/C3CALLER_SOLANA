@@ -27,7 +27,7 @@ pub mod c_3caller_solana {
         Ok(())
     }
 
-    pub fn c3call(ctx: Context<C3CallerState>,_dapp_id:u128,_caller:Pubkey,_to:String, _to_chain_id:String,_data:Vec<u8>,_extra:Vec<u8>)-> Result<()> {
+    pub fn ccall(ctx: Context<C3CallerState>,_dapp_id:u128,_caller:Pubkey,_to:String, _to_chain_id:String,_data:Vec<u8>,_extra:Vec<u8>)-> Result<()> {
 
         require!(_dapp_id>0,C3CallerErros::DappIdisEmpty);
         require!(_to.len()>0, C3CallerErros::ToisEmpty);
