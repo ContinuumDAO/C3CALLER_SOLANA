@@ -7,7 +7,7 @@ mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
-declare_id!("EQPiEmWVmpkD53LfBahxY8gFaEiDzsjobLKuyxDmPHy9");
+declare_id!("8UDMxfQHSEsCaMq4rBz5493UyMgiv2sBMXeiDf2jECX7");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
@@ -53,7 +53,7 @@ pub mod c_3caller_solana {
         
     }
 
-    pub fn c3broadcast(ctx: Context<C3CallerState>,_dapp_id:u128,_caller:Pubkey,_to:Vec<String>, _to_chain_ids:Vec<String>,_data:Vec<u8>)->Result<()>{
+    pub fn cbroadcast(ctx: Context<C3CallerState>,_dapp_id:u128,_caller:Pubkey,_to:Vec<String>, _to_chain_ids:Vec<String>,_data:Vec<u8>)->Result<()>{
         require!(_dapp_id>0,C3CallerErros::DappIdisEmpty);
         require!(_to.len()>0, C3CallerErros::ToisEmpty);
         require!(&_to_chain_ids.len()>&0,C3CallerErros::ToChainIdisEmpty);
@@ -82,11 +82,12 @@ pub mod c_3caller_solana {
     }
 
     #[access_control(check_owner(&ctx))]
-    pub fn execute(ctx: Context<C3CallerState> ,dapp_id:u128
+    pub fn execute(ctx: Context<ExecuteState> ,dapp_id:u128
         ,tx_sender:String,_message:C3SolMessage)-> Result<()>{
 
         //require!(_message.data.len() >0,C3CallerErros::DataisEmpty);
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
+        require!(ctx.accounts.target_program.key() == _message.data.program_id,C3CallerErros::TargetProgramIdMismatch);
        
 
        let mut accounts = Vec::with_capacity(_message.data.accounts.len());
@@ -101,7 +102,11 @@ pub mod c_3caller_solana {
         data: _message.data.data.clone()
        };
 
-       let resutl = invoke(&ix, &[ctx.accounts.signer.to_account_info()]);
+       let account_infos = vec![
+            ctx.accounts.target_program.clone(),
+            ctx.accounts.signer.to_account_info(),
+        ];
+       let resutl = invoke(&ix, &account_infos);
         emit!(LogExecCall{
             dapp_id:dapp_id,
             to:_message.to.clone(),
@@ -135,7 +140,7 @@ pub mod c_3caller_solana {
         Ok(())
     }
     #[access_control(check_owner(&ctx))]
-    pub fn c3_fallback(ctx: Context<C3CallerState>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3SolMessage)-> Result<()>{
+    pub fn cfallback(ctx: Context<ExecuteState>, _dapp_id:u128, _tx_sender:Pubkey, _message:C3SolMessage)-> Result<()>{
     
        // require!(_message.data.len()>0,C3CallerErros::DataisEmpty);
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
@@ -174,7 +179,7 @@ pub mod c_3caller_solana {
 
 }
 
-fn check_owner(ctx: &Context<C3CallerState>)->Result<()>{
+fn check_owner(ctx: &Context<ExecuteState>)->Result<()>{
     require_keys_eq!(
         ctx.accounts.signer.key(),ctx.accounts.owner.onwer_key,C3CallerErros::NotOwner
     );
@@ -222,6 +227,8 @@ pub struct C3CallerState<'info>{
     pub signer: Signer<'info>,
 }
 
+
+
 #[derive(Accounts)]
 pub struct SetPause<'info>{
     #[account(mut,seeds=[PAUSE_SEED], bump)]
@@ -235,6 +242,21 @@ pub struct UpdateOwner<'info>{
     #[account(mut,seeds=[OWNER_KEY_SEED], bump)]
     owner:Account<'info,OwnerKey>,
     signer:Signer<'info>,
+}
+
+#[event_cpi]
+#[derive(Accounts)]
+pub struct ExecuteState<'info>{
+    #[account()]
+    pub pause:Account<'info,Pause>,
+    #[account()]
+    pub owner:Account<'info,OwnerKey>,
+    #[account(mut)]
+    pub c3_uuid : Account<'info, C3UUIDKeeper>,
+    #[account(mut)]
+    pub signer: Signer<'info>,
+     /// CHECK: This is not dangerous because we are verifying that this is the correct program ID in the function
+    pub target_program: AccountInfo<'info>,
 }
 
 

@@ -15,7 +15,9 @@ pub enum C3CallerErros{
     #[msg("C3Caller: contracted is paused")]
     ContractIsPaused,
     #[msg("C3Caller: not the owner")]
-    NotOwner
+    NotOwner,
+    #[msg("C3Caller:Target program account is different from the target program ID")]
+    TargetProgramIdMismatch
 
 
 
