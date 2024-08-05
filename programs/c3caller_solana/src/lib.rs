@@ -7,7 +7,7 @@ mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
-declare_id!("8UDMxfQHSEsCaMq4rBz5493UyMgiv2sBMXeiDf2jECX7");
+declare_id!("Fut1oBKJGpfQciJrWFKRcQNJ4Y7iQJv6rwv5RbGnrLs2");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
@@ -191,7 +191,7 @@ fn check_owner(ctx: &Context<ExecuteState>)->Result<()>{
 pub struct InitC3Caller<'info> {
     #[account(init,
     payer = signer,
-    space= size_of::<C3UUIDKeeper>()+8,
+    space= size_of::<C3UUIDKeeper>()+108,
     seeds =[C3UUID_KEEPER_SEED],
     bump)]
     pub c3_uuid : Account<'info, C3UUIDKeeper>,
