@@ -7,7 +7,7 @@ mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
-declare_id!("Fut1oBKJGpfQciJrWFKRcQNJ4Y7iQJv6rwv5RbGnrLs2");
+declare_id!("GYtoknPePL58qaXtaRmp4annpnAvPrYcdvv9ghtbLKoL");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
@@ -146,11 +146,25 @@ pub mod c_3caller_solana {
         require!(!ctx.accounts.pause.is_paused,C3CallerErros::ContractIsPaused);
       
 
-       let context: C3Context = C3Context{
-        swap_id: _message.uuid,
-        from_chain_id: _message.from_chain_id.clone(),
-        source_tx: _message.source_tx.clone(),
-    };
+        let mut accounts = Vec::with_capacity(_message.data.accounts.len());
+
+        for acc in _message.data.accounts.iter(){
+         accounts.push( AccountMeta::from(acc));
+            
+        }
+        let ix = Instruction{
+         program_id: _message.data.program_id,
+         accounts: accounts,
+         data: _message.data.data.clone()
+        };
+ 
+        let account_infos = vec![
+             ctx.accounts.target_program.clone(),
+             ctx.accounts.signer.to_account_info(),
+         ];
+        let _resutl = invoke(&ix, &account_infos).unwrap();
+
+        ctx.accounts.c3_uuid.uuid_2_nonce.push(_message.uuid);
 
     emit!(LogExecFallback{
         dapp_id:_dapp_id,
@@ -191,7 +205,7 @@ fn check_owner(ctx: &Context<ExecuteState>)->Result<()>{
 pub struct InitC3Caller<'info> {
     #[account(init,
     payer = signer,
-    space= size_of::<C3UUIDKeeper>()+108,
+    space= size_of::<C3UUIDKeeper>()+1024,
     seeds =[C3UUID_KEEPER_SEED],
     bump)]
     pub c3_uuid : Account<'info, C3UUIDKeeper>,
