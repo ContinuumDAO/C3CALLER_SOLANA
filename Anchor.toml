@@ -6,6 +6,7 @@ skip-lint = false
 
 [programs.devnet]
 theia = "7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y"
+theia_uuid_keeper = "6zEAEfszDLaJ463PVDz8raSYgGQR74gv4TTJh4BLJM4C"
 
 [programs.localnet]
 c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
