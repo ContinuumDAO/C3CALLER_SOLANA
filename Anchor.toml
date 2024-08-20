@@ -4,6 +4,9 @@
 seeds = false
 skip-lint = false
 
+[programs.devnet]
+theia = "7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y"
+
 [programs.localnet]
 c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
 
@@ -11,7 +14,7 @@ c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "Devnet"
 wallet = "/Users/davidkathoh/.config/solana/id.json"
 
 [scripts]
