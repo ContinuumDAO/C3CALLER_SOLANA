@@ -5,6 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
+fee_manager = "2rxx7u9C5D5bMdjYmUz6LGkkfe6uwd2RPmgTVuidDW3B"
 theia = "7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y"
 theia_uuid_keeper = "6zEAEfszDLaJ463PVDz8raSYgGQR74gv4TTJh4BLJM4C"
 
