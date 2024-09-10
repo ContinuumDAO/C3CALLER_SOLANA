@@ -6,7 +6,9 @@ skip-lint = false
 
 [programs.devnet]
 fee_manager = "2rxx7u9C5D5bMdjYmUz6LGkkfe6uwd2RPmgTVuidDW3B"
+govern_dapp = "4iYameyivGuoQjBWAzY5fvQiDLVxmfW2vVxGaw1mMNna"
 theia = "7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y"
+theia_router_config = "Gh327SmhfBRnfaYJwwC59h8vZs3psnAZWqQm1wXPuERq"
 theia_uuid_keeper = "6zEAEfszDLaJ463PVDz8raSYgGQR74gv4TTJh4BLJM4C"
 
 [programs.localnet]

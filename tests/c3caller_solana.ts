@@ -49,6 +49,7 @@ describe("c3caller_solana", () => {
     }).rpc()
 
     //const g = await program.methods.
+    
     await new Promise((resolve) => setTimeout(resolve, 5000));
     program.removeEventListener(listenerLogC3Call);
      console.log("Your transaction signature",tx);
