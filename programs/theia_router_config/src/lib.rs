@@ -353,6 +353,83 @@ impl TheiaRouterConfig {
 
         Ok(())
     }
+    pub fn get_chain_config(&self, chain_id: u64) -> Result<ChainConfig> {
+        self.chain_config.get(&chain_id).cloned().ok_or(TheiaRouterConfigError::ChainConfigNotFound.into())
+    }
+
+    pub fn get_token_config(&self, token_id: String, chain_id: u64) -> Result<TokenConfig> {
+        self.token_config
+            .get(&token_id)
+            .and_then(|configs| configs.get(&chain_id))
+            .cloned()
+            .ok_or(TheiaRouterConfigError::TokenConfigNotFound.into())
+    }
+
+    pub fn get_swap_config(&self, token_id: String, src_chain_id: u64, dst_chain_id: u64) -> Result<SwapConfig> {
+        self.swap_config
+            .get(&token_id)
+            .and_then(|src_configs| src_configs.get(&src_chain_id))
+            .and_then(|dst_configs| dst_configs.get(&dst_chain_id))
+            .cloned()
+            .ok_or(TheiaRouterConfigError::SwapConfigNotFound.into())
+    }
+
+    pub fn get_mpc_pubkey(&self, addr: String) -> Result<String> {
+        self.mpc_pubkey.get(&addr).cloned().ok_or(TheiaRouterConfigError::MPCPubkeyNotFound.into())
+    }
+
+    pub fn get_all_multichain_tokens(&self, token_id: String) -> Result<Vec<MultichainToken>> {
+        self.all_multichain_tokens
+            .get(&token_id)
+            .cloned()
+            .ok_or(TheiaRouterConfigError::MultichainTokensNotFound.into())
+    }
+
+    pub fn get_all_swap_configs(&self, token_id: String) -> Result<Vec<SwapConfig>> {
+        self.all_swap_configs
+            .get(&token_id)
+            .cloned()
+            .ok_or(TheiaRouterConfigError::SwapConfigsNotFound.into())
+    }
+
+    pub fn is_chain_id_exist(&self, chain_id: u64) -> bool {
+        self.all_chain_ids_map.contains_key(&chain_id)
+    }
+
+    pub fn is_token_id_exist(&self, token_id: &str) -> bool {
+        self.all_token_ids_map.contains_key(token_id)
+    }
+
+    pub fn get_token_id(&self, chain_id: u64, token_address: &str) -> Result<String> {
+        self.token_id_map
+            .get(&chain_id)
+            .and_then(|tokens| tokens.get(token_address))
+            .cloned()
+            .ok_or(TheiaRouterConfigError::TokenIDNotFound.into())
+    }
+
+    pub fn get_multichain_token(&self, token_id: &str, chain_id: u64) -> Result<String> {
+        self.all_multichain_tokens_map
+            .get(token_id)
+            .and_then(|tokens| tokens.get(&chain_id))
+            .cloned()
+            .ok_or(TheiaRouterConfigError::MultichainTokenNotFound.into())
+    }
+
+    pub fn has_role(&self, role: [u8; 32], account: &Pubkey) -> bool {
+        // Implement role checking logic here
+        // For simplicity, we'll just check if the account is the governor
+        *account == self.gov
+    }
+
+    pub fn require_role(&self, role: [u8; 32], account: &Pubkey) -> Result<()> {
+        if self.has_role(role, account) {
+            Ok(())
+        } else {
+            Err(TheiaRouterConfigError::Unauthorized.into())
+        }
+    }
+
 
     // Implement getter functions here...
 }
@@ -383,3 +460,30 @@ pub struct LogSetTokenConfig {
     pub router_contract: String,
     pub extra: String,
 }
+
+#[error_code]
+pub enum TheiaRouterConfigError {
+    #[msg("Invalid chain ID")]
+    InvalidChainId,
+    #[msg("Invalid input")]
+    InvalidInput,
+    #[msg("Chain config not found")]
+    ChainConfigNotFound,
+    #[msg("Token config not found")]
+    TokenConfigNotFound,
+    #[msg("Swap config not found")]
+    SwapConfigNotFound,
+    #[msg("MPC pubkey not found")]
+    MPCPubkeyNotFound,
+    #[msg("Multichain tokens not found")]
+    MultichainTokensNotFound,
+    #[msg("Swap configs not found")]
+    SwapConfigsNotFound,
+    #[msg("Token ID not found")]
+    TokenIDNotFound,
+    #[msg("Multichain token not found")]
+    MultichainTokenNotFound,
+    #[msg("Unauthorized")]
+    Unauthorized,
+}
+

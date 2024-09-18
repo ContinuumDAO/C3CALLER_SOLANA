@@ -17,6 +17,8 @@ impl TheiaRouter {
    
     pub fn get_liquidity(&self, token: Pubkey) -> Result<(u64, u8)> {
         // Implement get_liquidity logic here
+        
+
         Ok((0, 0))
     }
 

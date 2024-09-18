@@ -14,3 +14,10 @@ pub struct LogChangeTheiaConfig {
 pub struct LogChangeFeeManager {
     pub fee_manager: Pubkey,
 }
+
+#[event]
+pub struct LogTheiaCross{
+
+}
+
+

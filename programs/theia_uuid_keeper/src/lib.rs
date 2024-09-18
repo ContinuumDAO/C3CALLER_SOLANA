@@ -12,29 +12,27 @@ pub mod theia_uuid_keeper {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+
+        
         Ok(())
     }
 
-    pub fn is_uuid_exist(ctx:Context<Initialize> ) -> Result<()>{
+   
+    pub fn is_completed(ctx:Context<TheiaKeeper>)-> Result<bool>{
+        Ok(ctx.accounts.uuid_nonce.completed)
+    }
+  
+    pub fn register_uuid(ctx: Context<TheiaKeeper>) ->Result<()>{
+        ctx.accounts.uuid_nonce.completed = true;   // set swap status to true
         Ok(())
     }
 
-    pub fn is_completed(ctx:Context<CompleteSwap>)-> Result<()>{
-
-            // retunn swap status of a swap
+    pub fn set_nonce(ctx:Context<TheiaKeeper>, nonce:u64)->Result<()>{
+        ctx.accounts.uuid_nonce.nonce = nonce;
+        ctx.accounts.uuid_nonce.completed = false;
         Ok(())
     }
-    pub fn revoke_swapin(ctx:Context<CompleteSwap>)->Result<()>{
-            // set swap status to false
-        Ok(())
-    }
-    pub fn register_uuid(ctx: Context<CompleteSwap>) ->Result<()>{
-
-        // set swap status to true
-        Ok(())
-    }
-
-    pub fn gen_uuid_non_evm(ctx: Context<ThieaKeeper>, data:NonEvmData)->Result<[u8;32]>{
+    pub fn gen_uuid_non_evm(ctx: Context<GenerateUuid>, data:NonEvmData)->Result<[u8;32]>{
 
 
         // onlyoperator can call this function
@@ -42,6 +40,7 @@ pub mod theia_uuid_keeper {
         // check if the uuid account exist
         // set nonce value to account uui2Nonce 
         //then return  the value of the generated uuid
+        let current_nonce = ctx.accounts.current_nonce.nonce + 1 ;
         let uuid = hash(
             
             &[
@@ -51,32 +50,45 @@ pub mod theia_uuid_keeper {
                 &data.from.as_bytes()[..],
                 &data.receiver.as_bytes()[..],
                 &data.amount.to_be_bytes()[..],
-                &ctx.accounts.current_nonce.nonce.to_be_bytes()[..],
+                &current_nonce.to_be_bytes()[..],
                 & data.to_chain_id.as_bytes()[..],
                 & data.call_data[..]
             ].concat()
-        ).to_bytes();
+        ).to_bytes(); 
+
+        ctx.accounts.uuid_nonce.uuid = uuid;
+        ctx.accounts.uuid_nonce.nonce = current_nonce;
+        ctx.accounts.uuid_nonce.completed = false;
         
-        
-        ctx.accounts.uuid_nonce.nonce = ctx.accounts.current_nonce.nonce;
+        ctx.accounts.current_nonce.nonce = current_nonce;
         Ok(uuid)
 
     }
 
-    // pub fn calc_caller_uuid(){
-    //     // increment a nonce from the current nonce value
-    //     // return encode  and hash with kecca256
-
+    pub fn gen_uuid_evm(ctx:Context<GenerateUuid>, data:EvmData)->Result<[u8;32]>{
+        let current_nonce = ctx.accounts.current_nonce.nonce + 1 ; 
+        let uuid = hash(
         
-    // }
+            &[
+                &ctx.program_id.to_bytes()[..],
+                &ctx.accounts.payer.key.to_bytes()[..],
+                &data.token.as_bytes()[..],
+                &data.from.as_bytes()[..],
+                &data.receiver.as_bytes()[..], 
+                &data.amount.to_be_bytes()[..],
+                &current_nonce.to_be_bytes()[..],
+                &data.to_chain_id.as_bytes()[..],
+            ].concat()
+        ).to_bytes(); 
 
-    // pub fn calc_caller_encode(){
+        ctx.accounts.uuid_nonce.uuid = uuid;
+        ctx.accounts.uuid_nonce.nonce = current_nonce;
+        ctx.accounts.uuid_nonce.completed = false;
 
-    //     // updated nonce local variable and increament the cureent by 1
-    //     // encode
-
-
-    // }
+        ctx.accounts.current_nonce.nonce = current_nonce;
+        Ok(uuid)
+    }
+   
 }
 
 #[derive(Accounts)]
@@ -87,7 +99,7 @@ pub struct Initialize<'info>{
         init,
         payer = signer,
         space = 8 + CurrentNonce::INIT_SPACE,
-        seeds = [],
+        seeds = [b"current_nonce"],
         bump
     )]
     pub current_nonce:Account<'info,CurrentNonce>,
@@ -97,57 +109,43 @@ pub struct Initialize<'info>{
 }
 
 
+
 #[derive(Accounts)]
-#[instruction(uuid: String)]
-pub struct CompleteSwap<'info>{
-    #[account(mut)]
-    pub payer:Signer<'info>,
+pub struct GenerateUuid<'info>{
     #[account(
-        mut,
-        seeds = [uuid.as_bytes().as_ref()],
-        bump,
-    )]
-    pub swap: Account<'info,Swap>,
-
-    #[account(mut)]
-    pub current_nonce:Account<'info,CurrentNonce>
-
-}
-
-#[derive(Accounts)]
-#[instruction(uuid:String)]
-pub struct ThieaKeeper<'info>{
-    #[account(mut)]
+        init,
+        payer = signer,
+        space = 8 + Uuid2Nonce::INIT_SPACE,
+        seeds = [b"uuid_nonce",(current_nonce.nonce + 1).to_be_bytes().as_ref()],
+        bump
+    )] 
+    pub uuid_nonce:Account<'info,Uuid2Nonce>, 
+    #[account(mut)] 
     pub payer:Signer<'info>,
     #[account(mut)]
     pub current_nonce:Account<'info,CurrentNonce>,
+  
+}
+#[derive(Accounts)]
+pub struct TheiaKeeper<'info> {
     #[account(mut)]
-    pub uuid_nonce:Account<'info,Uuid2Nonce>,
-}
-
-impl CompleteSwap<'_>{
-
-    pub fn apply(ctx: &mut Context<CompleteSwap>, uuid:&String)->Result<()>{
-        
-        Ok(())
-    }
-
-}
-
-
-
-#[account]
-#[derive(InitSpace)]
-pub struct Swap{
-    pub completed:bool,
+    pub payer: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [b"uuid_nonce", uuid_nonce.nonce.to_be_bytes().as_ref()],
+        bump
+    )]
+    pub uuid_nonce: Account<'info, Uuid2Nonce>,
+    pub system_program: Program<'info, System>,
 }
 
 #[account]
 #[derive(InitSpace)]
 pub struct Uuid2Nonce{
+    pub uuid:[u8;32],
     pub nonce:u64,
+    pub completed:bool,
 }
-
 
 #[account]
 #[derive(InitSpace)]
