@@ -1,13 +1,14 @@
 use anchor_lang::prelude::*;
-mod state;
+pub mod state;
 use crate::state::*;
+
 
 declare_id!("6zEAEfszDLaJ463PVDz8raSYgGQR74gv4TTJh4BLJM4C");
 
 #[program]
 pub mod theia_uuid_keeper {
     use anchor_lang::solana_program::keccak::hash;
-    use state::NonEvmData;
+    pub use state::NonEvmData;
 
     use super::*;
 
@@ -114,7 +115,7 @@ pub struct Initialize<'info>{
 pub struct GenerateUuid<'info>{
     #[account(
         init,
-        payer = signer,
+        payer = payer,
         space = 8 + Uuid2Nonce::INIT_SPACE,
         seeds = [b"uuid_nonce",(current_nonce.nonce + 1).to_be_bytes().as_ref()],
         bump
@@ -124,6 +125,7 @@ pub struct GenerateUuid<'info>{
     pub payer:Signer<'info>,
     #[account(mut)]
     pub current_nonce:Account<'info,CurrentNonce>,
+    pub system_program:Program<'info,System>
   
 }
 #[derive(Accounts)]

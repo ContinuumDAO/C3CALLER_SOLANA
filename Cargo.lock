@@ -1568,6 +1568,7 @@ name = "theia"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
+ "theia_uuid_keeper",
 ]
 
 [[package]]

@@ -17,3 +17,4 @@ default = []
 
 [dependencies]
 anchor-lang = "0.29.0"
+theia_uuid_keeper = {path = "../theia_uuid_keeper", features =["cpi"]}

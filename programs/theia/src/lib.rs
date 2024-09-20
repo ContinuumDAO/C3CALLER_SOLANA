@@ -1,146 +1,238 @@
-use anchor_lang::prelude::*;
 
+
+use anchor_lang::prelude::*;
 mod events;
 pub use events::*;
+
+ use theia_uuid_keeper::cpi::accounts::GenerateUuid;
+ use theia_uuid_keeper::program::TheiaUuidKeeper;
+ use theia_uuid_keeper::Uuid2Nonce;
+ use theia_uuid_keeper::CurrentNonce;
+ use theia_uuid_keeper::state::EvmData;
 
 declare_id!("7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y");
 
 #[program]
 pub mod theia {
-   
+    use super::*;
+
 
     pub fn initialize(
-        ctx: Context<Initialize>,
-        w_native: Pubkey,
-        uuid_keeper: Pubkey,
-        theia_config: Pubkey,
-        fee_manager: Pubkey,
-        gov: Pubkey,
-        c3caller_proxy: Pubkey,
-        tx_sender: Pubkey,
-        dapp_id: u64,
-    ) -> Result<()> {
-        let router = &mut ctx.accounts.router;
-        router.w_native = w_native;
-        router.uuid_keeper = uuid_keeper;
-        router.theia_config = theia_config;
-        router.fee_manager = fee_manager;
-        router.gov = gov;
-        router.c3caller_proxy = c3caller_proxy;
-        router.tx_senders.push(tx_sender);
-        router.dapp_id = dapp_id;
-        router.bump = *ctx.bumps.get("router").unwrap();
+        ctx: Context<Initialize> ) -> Result<()> {
+       
         Ok(())
     }
 
-    pub fn change_uuid_keeper(ctx: Context<ChangeConfig>, uuid_keeper: Pubkey) -> Result<()> {
-        let router = &mut ctx.accounts.router;
-        router.uuid_keeper = uuid_keeper;
-        emit!(LogChangeUUIDKeeper { uuid_keeper });
+    // pub fn change_uuid_keeper(ctx: Context<ChangeConfig>, uuid_keeper: Pubkey) -> Result<()> {
+    //     let router = &mut ctx.accounts.router;
+    //     router.uuid_keeper = uuid_keeper;
+    //     emit!(LogChangeUUIDKeeper { uuid_keeper });
+    //     Ok(())
+    // }
+
+    // pub fn change_theia_config(ctx: Context<ChangeConfig>, theia_config: Pubkey) -> Result<()> {
+    //     let router = &mut ctx.accounts.router;
+    //     router.theia_config = theia_config;
+    //     emit!(LogChangeTheiaConfig { theia_config });
+    //     Ok(())
+    // }
+
+    // pub fn change_fee_manager(ctx: Context<ChangeConfig>, fee_manager: Pubkey) -> Result<()> {
+    //     let router = &mut ctx.accounts.router;
+    //     router.fee_manager = fee_manager;
+    //     emit!(LogChangeFeeManager { fee_manager });
+    //     Ok(())
+    // }
+
+    // pub fn set_minter(ctx: Context<SetMinter>, token: Pubkey, auth: Pubkey) -> Result<()> {
+    //     // Implement set_minter logic here
+    //     Ok(())
+    // }
+
+    // pub fn apply_minter(ctx: Context<ApplyMinter>, token: Pubkey) -> Result<()> {
+    //     // Implement apply_minter logic here
+    //     Ok(())
+    // }
+
+    // pub fn revoke_minter(ctx: Context<RevokeMinter>, token: Pubkey, auth: Pubkey) -> Result<()> {
+    //     // Implement revoke_minter logic here
+    //     Ok(())
+    // }
+
+    // pub fn get_liquidity(ctx: Context<GetLiquidity>, token: Pubkey) -> Result<(u64, u8)> {
+    //     let (liquidity, decimals) = ctx.accounts.router.get_liquidity(token)?;
+    //     Ok((liquidity, decimals))
+    // }
+
+    // pub fn query_liquidity_fee_rate(ctx: Context<QueryLiquidityFeeRate>, theia_token: Pubkey, amount: u64) -> Result<u64> {
+    //     let router = &ctx.accounts.router;
+    //     let fee_rate = router.query_liquidity_fee_rate(theia_token, amount)?;
+    //     let base_fee = router.get_base_liquidity_fee(theia_token)?;
+    //     let fee = (base_fee * fee_rate) / 1000;
+    //     Ok(fee)
+    // }
+
+
+    pub fn theia_cross_non_evm(ctx: Context<TheiaCrossNonEvm>) -> Result<()>{
+
+        
+        //check if the params are valid
+
+        //get _revAmount from getRevAmount()
+         // generate the uuid by cpi into uuid keeper
+
+         //  get swap fee  from _calcAndPay()
+
+         // geneerate calldata and cpi into c3caller
+
+         // then emit event
         Ok(())
     }
 
-    pub fn change_theia_config(ctx: Context<ChangeConfig>, theia_config: Pubkey) -> Result<()> {
-        let router = &mut ctx.accounts.router;
-        router.theia_config = theia_config;
-        emit!(LogChangeTheiaConfig { theia_config });
-        Ok(())
+    pub fn theia_cross_evm(ctx: Context<TheiaCrossEvm>) -> Result<()>{
+
+
+        let cpi_ctx = CpiContext::new(ctx.accounts.theia_uuid_keeper.to_account_info(), GenerateUuid{
+            uuid_nonce: ctx.accounts.uuid_nonce.to_account_info(),
+            payer: ctx.accounts.payer.to_account_info(),
+            current_nonce: ctx.accounts.current_nonce.to_account_info(),
+            system_program: ctx.accounts.system_program.to_account_info(),
+        });
+
+        let res = theia_uuid_keeper::cpi::gen_uuid_evm(cpi_ctx, EvmData {
+            token: Pubkey::new_unique().to_string(),
+            from: Pubkey::new_unique().to_string(),
+            amount: 30,
+            receiver: Pubkey::new_unique().to_string(),
+            to_chain_id: 1.to_string(),
+        });
+
+        if res.is_ok() {
+            return Ok(())
+        }else{
+
+            return Ok(());
+        }
+
+        // Check if the params are valid
+        // TODO: Implement parameter validation
+
+        // Get _revAmount from getRevAmount()
+        // TODO: Implement getRevAmount() function and call it here
+
+        // UUID has been generated by CPI into uuid keeper
+
+         //  get swap fee  from _calcAndPay()
+
+         // geneerate calldata and cpi into c3caller
+
+
+         //todo cpi into c3caller
+
+         // then emit event
+
+        
+
     }
 
-    pub fn change_fee_manager(ctx: Context<ChangeConfig>, fee_manager: Pubkey) -> Result<()> {
-        let router = &mut ctx.accounts.router;
-        router.fee_manager = fee_manager;
-        emit!(LogChangeFeeManager { fee_manager });
-        Ok(())
-    }
+//     pub fn theia_vault_auto(ctx: Context<TheiaVaultAuto>, params: VaultAuto) -> Result<()>{
 
-    pub fn set_minter(ctx: Context<SetMinter>, token: Pubkey, auth: Pubkey) -> Result<()> {
-        // Implement set_minter logic here
-        Ok(())
-    }
+     
+         
 
-    pub fn apply_minter(ctx: Context<ApplyMinter>, token: Pubkey) -> Result<()> {
-        // Implement apply_minter logic here
-        Ok(())
-    }
 
-    pub fn revoke_minter(ctx: Context<RevokeMinter>, token: Pubkey, auth: Pubkey) -> Result<()> {
-        // Implement revoke_minter logic here
-        Ok(())
-    }
 
-    pub fn get_liquidity(ctx: Context<GetLiquidity>, token: Pubkey) -> Result<(u64, u8)> {
-        let (liquidity, decimals) = ctx.accounts.router.get_liquidity(token)?;
-        Ok((liquidity, decimals))
-    }
 
-    pub fn query_liquidity_fee_rate(ctx: Context<QueryLiquidityFeeRate>, theia_token: Pubkey, amount: u64) -> Result<u64> {
-        let router = &ctx.accounts.router;
-        let fee_rate = router.query_liquidity_fee_rate(theia_token, amount)?;
-        let base_fee = router.get_base_liquidity_fee(theia_token)?;
-        let fee = (base_fee * fee_rate) / 1000;
-        Ok(fee)
-    }
 
-    // Add other instruction handlers here...
-}
+//         Ok(())
+
+//     }
+
+  
+// }
+
+// pub fn _get_rev_amount(ctx: Context<TheiaVaultAuto>, params: VaultAuto) -> Result<()>{
+
+
+//     // transfer native vs transfer
+
+//     Ok(())
+
+ }
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-    #[account(init, payer = user, space = 8 + TheiaRouter::MAX_SIZE)]
-    pub router: Account<'info, TheiaRouter>,
+   
+
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
-pub struct ChangeConfig<'info> {
-    #[account(mut, has_one = gov)]
-    pub router: Account<'info, TheiaRouter>,
-    pub gov: Signer<'info>,
+pub struct TheiaCrossNonEvm<'info>{
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
-pub struct SetMinter<'info> {
-    #[account(mut, has_one = gov)]
-    pub router: Account<'info, TheiaRouter>,
-    pub gov: Signer<'info>,
-    /// CHECK: This account is checked in the instruction
-    pub token: AccountInfo<'info>,
+pub struct TheiaCrossEvm<'info>{
+    #[account(mut)]
+    pub theia_uuid_keeper: Program<'info, TheiaUuidKeeper>,
+    pub uuid_nonce: Account<'info, Uuid2Nonce>,
+    pub current_nonce: Account<'info, CurrentNonce>,
+    pub payer: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
 
-#[derive(Accounts)]
-pub struct ApplyMinter<'info> {
-    #[account(mut, has_one = gov)]
-    pub router: Account<'info, TheiaRouter>,
-    pub gov: Signer<'info>,
-    /// CHECK: This account is checked in the instruction
-    pub token: AccountInfo<'info>,
-}
+// #[derive(Accounts)]
+// pub struct ChangeConfig<'info> {
+//     #[account(mut, has_one = gov)]
+//     pub router: Account<'info, TheiaRouter>,
+//     pub gov: Signer<'info>,
+// }
 
-#[derive(Accounts)]
-pub struct RevokeMinter<'info> {
-    #[account(mut, has_one = gov)]
-    pub router: Account<'info, TheiaRouter>,
-    pub gov: Signer<'info>,
-    /// CHECK: This account is checked in the instruction
-    pub token: AccountInfo<'info>,
-}
+// #[derive(Accounts)]
+// pub struct SetMinter<'info> {
+//     #[account(mut, has_one = gov)]
+//     pub router: Account<'info, TheiaRouter>,
+//     pub gov: Signer<'info>,
+//     /// CHECK: This account is checked in the instruction
+//     pub token: AccountInfo<'info>,
+// }
 
-#[derive(Accounts)]
-pub struct GetLiquidity<'info> {
-    pub router: Account<'info, TheiaRouter>,
-    /// CHECK: This account is checked in the instruction
-    pub token: AccountInfo<'info>,
-}
+// #[derive(Accounts)]
+// pub struct ApplyMinter<'info> {
+//     #[account(mut, has_one = gov)]
+//     pub router: Account<'info, TheiaRouter>,
+//     pub gov: Signer<'info>,
+//     /// CHECK: This account is checked in the instruction
+//     pub token: AccountInfo<'info>,
+// }
 
-#[derive(Accounts)]
-pub struct QueryLiquidityFeeRate<'info> {
-    pub router: Account<'info, TheiaRouter>,
-    /// CHECK: This account is checked in the instruction
-    pub theia_token: AccountInfo<'info>,
-}
+// #[derive(Accounts)]
+// pub struct RevokeMinter<'info> {
+//     #[account(mut, has_one = gov)]
+//     pub router: Account<'info, TheiaRouter>,
+//     pub gov: Signer<'info>,
+//     /// CHECK: This account is checked in the instruction
+//     pub token: AccountInfo<'info>,
+// }
+
+// #[derive(Accounts)]
+// pub struct GetLiquidity<'info> {
+//     pub router: Account<'info, TheiaRouter>,
+//     /// CHECK: This account is checked in the instruction
+//     pub token: AccountInfo<'info>,
+// }
+
+// #[derive(Accounts)]
+// pub struct QueryLiquidityFeeRate<'info> {
+//     pub router: Account<'info, TheiaRouter>,
+//     /// CHECK: This account is checked in the instruction
+//     pub theia_token: AccountInfo<'info>,
+// }
 
 
 #[error_code]
