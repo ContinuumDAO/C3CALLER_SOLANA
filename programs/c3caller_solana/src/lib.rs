@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use std::mem::size_of;
 mod errors;
 mod events;
-mod states;
+pub mod states;
 mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;

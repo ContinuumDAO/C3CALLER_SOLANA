@@ -1,5 +1,3 @@
-
-
 use anchor_lang::prelude::*;
 mod events;
 pub use events::*;
@@ -9,6 +7,11 @@ pub use events::*;
  use theia_uuid_keeper::Uuid2Nonce;
  use theia_uuid_keeper::CurrentNonce;
  use theia_uuid_keeper::state::EvmData;
+ use c_3caller_solana::cpi::accounts::C3CallerState;
+ use c_3caller_solana::program::C3callerSolana;
+ use c_3caller_solana::states::Pause;
+ use c_3caller_solana::states::OwnerKey;
+ use c_3caller_solana::states::C3UUIDKeeper;
 
 declare_id!("7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y");
 
@@ -108,10 +111,10 @@ pub mod theia {
         });
 
         if res.is_ok() {
-            return Ok(())
+            
         }else{
 
-            return Ok(());
+            
         }
 
         // Check if the params are valid
@@ -126,8 +129,28 @@ pub mod theia {
 
          // geneerate calldata and cpi into c3caller
 
+        let ctx_caller =  CpiContext::new(ctx.accounts.c3_caller.to_account_info(), C3CallerState{
+            pause: ctx.accounts.pause.to_account_info(),
+            owner: ctx.accounts.owner_key.to_account_info(),
+            c3_uuid: ctx.accounts.c3_uuid.to_account_info(),
+            signer: ctx.accounts.payer.to_account_info(),
+            event_authority: ctx.accounts.payer.to_account_info(),
+            program: ctx.accounts.c3_caller.to_account_info(),
+        });
+
+        let res_caller = c_3caller_solana::cpi::ccall(
+            ctx_caller,
+            42,  // Dummy value for the first u64 parameter
+            "".to_string(),
+            "".to_string(),
+            Pubkey::new_unique(),
+            Pubkey::new_unique().to_bytes().to_vec(),
+            Pubkey::new_unique().to_bytes().to_vec()
+        );
 
          //todo cpi into c3caller
+
+
 
          // then emit event
 
@@ -183,6 +206,10 @@ pub struct TheiaCrossEvm<'info>{
     pub uuid_nonce: Account<'info, Uuid2Nonce>,
     pub current_nonce: Account<'info, CurrentNonce>,
     pub payer: Signer<'info>,
+    pub c3_caller: Program<'info, C3callerSolana>,
+    pub c3_uuid: Account<'info, C3UUIDKeeper>,
+    pub pause: Account<'info, Pause>,
+    pub owner_key: Account<'info, OwnerKey>, 
     pub system_program: Program<'info, System>,
 }
 
