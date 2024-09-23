@@ -78,7 +78,7 @@ pub mod theia_uuid_keeper {
                 &data.receiver.as_bytes()[..], 
                 &data.amount.to_be_bytes()[..],
                 &current_nonce.to_be_bytes()[..],
-                &data.to_chain_id.as_bytes()[..],
+                &data.to_chain_id.to_be_bytes()[..],
             ].concat()
         ).to_bytes(); 
 
@@ -87,7 +87,10 @@ pub mod theia_uuid_keeper {
         ctx.accounts.uuid_nonce.completed = false;
 
         ctx.accounts.current_nonce.nonce = current_nonce;
+
+
         Ok(uuid)
+        
     }
    
 }

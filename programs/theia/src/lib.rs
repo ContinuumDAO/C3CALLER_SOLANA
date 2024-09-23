@@ -112,6 +112,7 @@ pub mod theia {
 
 
 
+        let uuid:[u8;32];
         let res = theia_uuid_keeper::cpi::gen_uuid_evm(cpi_ctx, EvmData {
             token: params.token_id,
             from: ctx.accounts.payer.key().to_string(),
@@ -120,12 +121,14 @@ pub mod theia {
             to_chain_id: params.to_chain_id,
         });
 
-        if res.is_ok() {
-            
-        }else{
-
-            
+        
+        match res {
+            Ok(_uuid) => uuid = _uuid.get(),
+            Err(err) => msg!(&err.to_string()),
         }
+            
+        
+       
 
         // Check if the params are valid
         // TODO: Implement parameter validation
@@ -138,10 +141,22 @@ pub mod theia {
          //  get swap fee  from _calcAndPay()
 
          // geneerate calldata and cpi into c3caller
+         let swap_fee = 0;
+         let token_info = TokenInfo {
+             addr: "".to_string(), // Replace with actual token address
+             decimals: 8, // Replace with actual decimals
+             to_chain_addr: "".to_string(), // Replace with actual to_chain_addr
+             to_chain_decimals: 8, // Replace with actual to_chain_decimals
+         };
+         let fee_token_info = TokenInfo {
+             addr: "".to_string(), // Replace with actual fee token address
+             decimals: 8, // Replace with actual fee token decimals
+             to_chain_addr: "".to_string(), // Replace with actual fee token to_chain_addr
+             to_chain_decimals: 8, // Replace with actual fee token to_chain_decimals
+         };
+         let data = gen_calldata(uuid, recv_amount, swap_fee, params, token_info, fee_token_info);
 
-         let data = gen_calldata(uuid, recv_amount, swap_fee, tc, t, fee);
-
-        let ctx_caller =  CpiContext::new(ctx.accounts.c3_caller.to_account_info(), C3CallerState{
+        let ctx_caller = CpiContext::new(ctx.accounts.c3_caller.to_account_info(), C3CallerState {
             pause: ctx.accounts.pause.to_account_info(),
             owner: ctx.accounts.owner_key.to_account_info(),
             c3_uuid: ctx.accounts.c3_uuid.to_account_info(),
@@ -153,9 +168,9 @@ pub mod theia {
         let res_caller = c_3caller_solana::cpi::ccall(
             ctx_caller,
             42,  // Dummy value for the first u64 parameter
-            "".to_string(),
-            "".to_string(),
             Pubkey::new_unique(),
+            "".to_string(),
+            "".to_string(),
             Pubkey::new_unique().to_bytes().to_vec(),
             Pubkey::new_unique().to_bytes().to_vec()
         );
@@ -166,7 +181,7 @@ pub mod theia {
         emit!(
             LogTheiaCross{
                 token: params.token_id,
-                from: ctx.ac,
+                from: "".to_string(),
                 swapout_id: uuid, 
                 amount: recv_amount,
                 from_chain_id: 10, 
@@ -210,20 +225,20 @@ pub mod theia {
  pub fn gen_calldata(uuid:[u8;32], recv_amount:u64, swap_fee:u64,tc:CrossAuto, t:TokenInfo,fee:TokenInfo)->Vec<u8>{
 
     let to_amount = recv_amount;
-    let liquidty_fee = 0;
+    let liquidty_fee:u64 = 0;
 
     let func_sign_theia = "0x3a1f8688";//"theiaVaultAuto(bytes32,address,address,uint256,uint256,uint256,address,address)";
 
     let mut call_data = Vec::new();
-    call_data.extend_from_slice(func_sign_theia.as_bytes());
-    call_data.extend_from_slice(&uuid);
-    call_data.extend_from_slice(&t.to_chain_addr);
-    call_data.extend_from_slice(&tc.receiver);
-    call_data.extend_from_slice(&to_amount.to_be_bytes());
-    call_data.extend_from_slice(&t.to_chain_decimals);
-    call_data.extend_from_slice(&liquidty_fee);
-    call_data.extend_from_slice(&fee.to_chain_addr);
-    call_data.extend_from_slice(&t.addr);
+    // call_data.extend_from_slice(func_sign_theia.as_bytes());
+    // call_data.extend_from_slice(&uuid);
+    // call_data.extend_from_slice(t.to_chain_addr.as_bytes());
+    // call_data.extend_from_slice(tc.receiver.as_bytes());
+    // call_data.extend_from_slice(&to_amount.to_le_bytes());
+    // call_data.extend_from_slice(&[t.to_chain_decimals]);
+    // call_data.extend_from_slice(&(liquidty_fee as u64).to_le_bytes());
+    // call_data.extend_from_slice(fee.to_chain_addr.as_bytes());
+    // call_data.extend_from_slice(t.addr.as_bytes());
 
     call_data
 }
