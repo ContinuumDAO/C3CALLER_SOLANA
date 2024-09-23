@@ -7,7 +7,7 @@ pub struct EvmData{
     pub from:String,
     pub amount:u64,
     pub receiver:String,
-    pub to_chain_id:String,
+    pub to_chain_id:u64,
     
 }
 

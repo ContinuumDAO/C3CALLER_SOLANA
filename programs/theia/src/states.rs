@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct CrossAuto {
-    pub target: Pubkey,
-    pub receiver: Pubkey,
+    pub target: String,
+    pub receiver: String,
     pub amount: u64,
     pub fee_amount: u64,
     pub to_chain_id: u64,
@@ -28,8 +28,8 @@ pub struct CrossNonEvm {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct TokenInfo {
-    pub addr: Pubkey,
+    pub addr: String,
     pub decimals: u8,
-    pub to_chain_addr: Pubkey,
+    pub to_chain_addr: String,
     pub to_chain_decimals: u8,
 }

@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 mod events;
+mod states;
+
 pub use events::*;
+pub use states::*;
 
  use theia_uuid_keeper::cpi::accounts::GenerateUuid;
  use theia_uuid_keeper::program::TheiaUuidKeeper;
@@ -92,9 +95,13 @@ pub mod theia {
         Ok(())
     }
 
-    pub fn theia_cross_evm(ctx: Context<TheiaCrossEvm>) -> Result<()>{
+    pub fn theia_cross_evm(ctx: Context<TheiaCrossEvm>, params: CrossAuto) -> Result<()>{
 
 
+
+
+        let recv_amount = params.amount;
+        let t = params.token_id;
         let cpi_ctx = CpiContext::new(ctx.accounts.theia_uuid_keeper.to_account_info(), GenerateUuid{
             uuid_nonce: ctx.accounts.uuid_nonce.to_account_info(),
             payer: ctx.accounts.payer.to_account_info(),
@@ -102,12 +109,15 @@ pub mod theia {
             system_program: ctx.accounts.system_program.to_account_info(),
         });
 
+
+
+
         let res = theia_uuid_keeper::cpi::gen_uuid_evm(cpi_ctx, EvmData {
-            token: Pubkey::new_unique().to_string(),
-            from: Pubkey::new_unique().to_string(),
-            amount: 30,
-            receiver: Pubkey::new_unique().to_string(),
-            to_chain_id: 1.to_string(),
+            token: params.token_id,
+            from: ctx.accounts.payer.key().to_string(),
+            amount: recv_amount,
+            receiver: params.receiver,
+            to_chain_id: params.to_chain_id,
         });
 
         if res.is_ok() {
@@ -128,6 +138,8 @@ pub mod theia {
          //  get swap fee  from _calcAndPay()
 
          // geneerate calldata and cpi into c3caller
+
+         let data = gen_calldata(uuid, recv_amount, swap_fee, tc, t, fee);
 
         let ctx_caller =  CpiContext::new(ctx.accounts.c3_caller.to_account_info(), C3CallerState{
             pause: ctx.accounts.pause.to_account_info(),
@@ -150,11 +162,22 @@ pub mod theia {
 
          //todo cpi into c3caller
 
-
-
          // then emit event
-
+        emit!(
+            LogTheiaCross{
+                token: params.token_id,
+                from: ctx.ac,
+                swapout_id: uuid, 
+                amount: recv_amount,
+                from_chain_id: 10, 
+                to_chain_id: params.to_chain_id,
+                fee: swap_fee, 
+                fee_token: "text".to_string(),
+                receiver: params.receiver,
+            }
+        );
         
+        Ok(())
 
     }
 
@@ -183,6 +206,27 @@ pub mod theia {
 
  }
 
+
+ pub fn gen_calldata(uuid:[u8;32], recv_amount:u64, swap_fee:u64,tc:CrossAuto, t:TokenInfo,fee:TokenInfo)->Vec<u8>{
+
+    let to_amount = recv_amount;
+    let liquidty_fee = 0;
+
+    let func_sign_theia = "0x3a1f8688";//"theiaVaultAuto(bytes32,address,address,uint256,uint256,uint256,address,address)";
+
+    let mut call_data = Vec::new();
+    call_data.extend_from_slice(func_sign_theia.as_bytes());
+    call_data.extend_from_slice(&uuid);
+    call_data.extend_from_slice(&t.to_chain_addr);
+    call_data.extend_from_slice(&tc.receiver);
+    call_data.extend_from_slice(&to_amount.to_be_bytes());
+    call_data.extend_from_slice(&t.to_chain_decimals);
+    call_data.extend_from_slice(&liquidty_fee);
+    call_data.extend_from_slice(&fee.to_chain_addr);
+    call_data.extend_from_slice(&t.addr);
+
+    call_data
+}
 #[derive(Accounts)]
 pub struct Initialize<'info> {
    

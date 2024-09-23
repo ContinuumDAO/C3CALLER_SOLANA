@@ -17,6 +17,15 @@ pub struct LogChangeFeeManager {
 
 #[event]
 pub struct LogTheiaCross{
+    pub token: String,
+    pub from: String,
+    pub swapout_id: [u8; 32],
+    pub amount: u64,
+    pub from_chain_id: u64,
+    pub to_chain_id: u64,
+    pub fee: u64,
+    pub fee_token: String,
+    pub receiver: String,
 
 }
 
