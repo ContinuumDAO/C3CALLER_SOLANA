@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 mod events;
 mod states;
-
+mod errors;
 pub use events::*;
 pub use states::*;
 
@@ -101,7 +101,12 @@ pub mod theia {
 
 
         let recv_amount = params.amount;
-        let t = params.token_id;
+        let t = TokenInfo {
+            addr: "".to_string(), // Replace with actual token address
+            decimals: 8, // Replace with actual decimals
+            to_chain_addr: "".to_string(), // Replace with actual to_chain_addr
+            to_chain_decimals: 8, // Replace with actual to_chain_decimals
+        };
         let cpi_ctx = CpiContext::new(ctx.accounts.theia_uuid_keeper.to_account_info(), GenerateUuid{
             uuid_nonce: ctx.accounts.uuid_nonce.to_account_info(),
             payer: ctx.accounts.payer.to_account_info(),
@@ -114,7 +119,7 @@ pub mod theia {
 
         let uuid:[u8;32];
         let res = theia_uuid_keeper::cpi::gen_uuid_evm(cpi_ctx, EvmData {
-            token: params.token_id,
+            token: t.addr,
             from: ctx.accounts.payer.key().to_string(),
             amount: recv_amount,
             receiver: params.receiver,
@@ -124,7 +129,7 @@ pub mod theia {
         
         match res {
             Ok(_uuid) => uuid = _uuid.get(),
-            Err(err) => msg!(&err.to_string()),
+            Err(_) => return err!(errors::TheiaError::GenUUIDCPIFailed),
         }
             
         
@@ -167,13 +172,20 @@ pub mod theia {
 
         let res_caller = c_3caller_solana::cpi::ccall(
             ctx_caller,
-            42,  // Dummy value for the first u64 parameter
-            Pubkey::new_unique(),
-            "".to_string(),
-            "".to_string(),
-            Pubkey::new_unique().to_bytes().to_vec(),
-            Pubkey::new_unique().to_bytes().to_vec()
+            40,  // dummy Dapp id 
+            *ctx.program_id,
+            params.target,
+            params.to_chain_id.to_string(),
+            data,
+            Vec::new()
         );
+
+        match res_caller {
+            Ok(_) => msg!("cpi to c3call success"),
+            Err(_) => return err!(errors::TheiaError::CcallCpiFailed),
+        }
+            
+        
 
          //todo cpi into c3caller
 
@@ -181,13 +193,13 @@ pub mod theia {
         emit!(
             LogTheiaCross{
                 token: params.token_id,
-                from: "".to_string(),
+                from: ctx.program_id.to_string(),
                 swapout_id: uuid, 
                 amount: recv_amount,
-                from_chain_id: 10, 
+                from_chain_id: 900 ,// solana mainnet chain Id ,  
                 to_chain_id: params.to_chain_id,
                 fee: swap_fee, 
-                fee_token: "text".to_string(),
+                fee_token: fee_token_info.addr,
                 receiver: params.receiver,
             }
         );
@@ -272,53 +284,7 @@ pub struct TheiaCrossEvm<'info>{
     pub system_program: Program<'info, System>,
 }
 
-// #[derive(Accounts)]
-// pub struct ChangeConfig<'info> {
-//     #[account(mut, has_one = gov)]
-//     pub router: Account<'info, TheiaRouter>,
-//     pub gov: Signer<'info>,
-// }
 
-// #[derive(Accounts)]
-// pub struct SetMinter<'info> {
-//     #[account(mut, has_one = gov)]
-//     pub router: Account<'info, TheiaRouter>,
-//     pub gov: Signer<'info>,
-//     /// CHECK: This account is checked in the instruction
-//     pub token: AccountInfo<'info>,
-// }
-
-// #[derive(Accounts)]
-// pub struct ApplyMinter<'info> {
-//     #[account(mut, has_one = gov)]
-//     pub router: Account<'info, TheiaRouter>,
-//     pub gov: Signer<'info>,
-//     /// CHECK: This account is checked in the instruction
-//     pub token: AccountInfo<'info>,
-// }
-
-// #[derive(Accounts)]
-// pub struct RevokeMinter<'info> {
-//     #[account(mut, has_one = gov)]
-//     pub router: Account<'info, TheiaRouter>,
-//     pub gov: Signer<'info>,
-//     /// CHECK: This account is checked in the instruction
-//     pub token: AccountInfo<'info>,
-// }
-
-// #[derive(Accounts)]
-// pub struct GetLiquidity<'info> {
-//     pub router: Account<'info, TheiaRouter>,
-//     /// CHECK: This account is checked in the instruction
-//     pub token: AccountInfo<'info>,
-// }
-
-// #[derive(Accounts)]
-// pub struct QueryLiquidityFeeRate<'info> {
-//     pub router: Account<'info, TheiaRouter>,
-//     /// CHECK: This account is checked in the instruction
-//     pub theia_token: AccountInfo<'info>,
-// }
 
 
 #[error_code]
