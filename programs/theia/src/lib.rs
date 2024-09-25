@@ -122,7 +122,7 @@ pub mod theia {
             token: t.addr,
             from: ctx.accounts.payer.key().to_string(),
             amount: recv_amount,
-            receiver: params.receiver,
+            receiver: params.receiver.clone(),
             to_chain_id: params.to_chain_id,
         });
 
@@ -159,7 +159,7 @@ pub mod theia {
              to_chain_addr: "".to_string(), // Replace with actual fee token to_chain_addr
              to_chain_decimals: 8, // Replace with actual fee token to_chain_decimals
          };
-         let data = gen_calldata(uuid, recv_amount, swap_fee, params, token_info, fee_token_info);
+         let data = gen_calldata(uuid, recv_amount, swap_fee, &params, &token_info, &fee_token_info);
 
         let ctx_caller = CpiContext::new(ctx.accounts.c3_caller.to_account_info(), C3CallerState {
             pause: ctx.accounts.pause.to_account_info(),
@@ -203,7 +203,6 @@ pub mod theia {
                 receiver: params.receiver,
             }
         );
-        
         Ok(())
 
     }
@@ -234,14 +233,14 @@ pub mod theia {
  }
 
 
- pub fn gen_calldata(uuid:[u8;32], recv_amount:u64, swap_fee:u64,tc:CrossAuto, t:TokenInfo,fee:TokenInfo)->Vec<u8>{
+ pub fn gen_calldata(uuid:[u8;32], recv_amount:u64, swap_fee:u64,tc:&CrossAuto, t:&TokenInfo,fee:&TokenInfo)->Vec<u8>{
 
     let to_amount = recv_amount;
     let liquidty_fee:u64 = 0;
 
     let func_sign_theia = "0x3a1f8688";//"theiaVaultAuto(bytes32,address,address,uint256,uint256,uint256,address,address)";
 
-    let mut call_data = Vec::new();
+    let  call_data = Vec::new();
     // call_data.extend_from_slice(func_sign_theia.as_bytes());
     // call_data.extend_from_slice(&uuid);
     // call_data.extend_from_slice(t.to_chain_addr.as_bytes());
@@ -272,10 +271,10 @@ pub struct TheiaCrossNonEvm<'info>{
 
 #[derive(Accounts)]
 pub struct TheiaCrossEvm<'info>{
-    #[account(mut)]
     pub theia_uuid_keeper: Program<'info, TheiaUuidKeeper>,
     pub uuid_nonce: Account<'info, Uuid2Nonce>,
     pub current_nonce: Account<'info, CurrentNonce>,
+    #[account(mut)]
     pub payer: Signer<'info>,
     pub c3_caller: Program<'info, C3callerSolana>,
     pub c3_uuid: Account<'info, C3UUIDKeeper>,

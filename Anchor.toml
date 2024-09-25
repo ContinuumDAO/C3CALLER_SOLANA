@@ -18,7 +18,7 @@ c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "localnet"
 wallet = "/Users/davidkathoh/.config/solana/id.json"
 
 [scripts]
