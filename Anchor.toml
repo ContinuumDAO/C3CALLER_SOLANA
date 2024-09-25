@@ -23,3 +23,4 @@ wallet = "/Users/davidkathoh/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test1 = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/theia.ts"

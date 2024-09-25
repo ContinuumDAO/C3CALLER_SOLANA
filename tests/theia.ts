@@ -1,10 +1,10 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Theia} from "../../../target/types/theia";
+import { Theia } from "../target/types/theia";
 
-describe("theia",()=>{
+describe("theia", () => {
 
-    const provider = anchor.AnchorProvider.env()
+    const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider)
 
     const systemProgram = anchor.web3.SystemProgram
