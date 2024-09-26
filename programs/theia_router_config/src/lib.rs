@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("Gh327SmhfBRnfaYJwwC59h8vZs3psnAZWqQm1wXPuERq");
+declare_id!("6iPQR3hQs5o542GFftpLSvPnkCzhQScfKs2bssW7quqs");
 
 #[program]
 pub mod theia_router_config {

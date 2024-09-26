@@ -16,7 +16,7 @@ pub use states::*;
  use c_3caller_solana::states::OwnerKey;
  use c_3caller_solana::states::C3UUIDKeeper;
 
-declare_id!("7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y");
+declare_id!("Dcvavuean23ijun4aG5Yxcespnfh15RHwdssjHuQFMkJ");
 
 #[program]
 pub mod theia {

@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 pub mod events;
 use events::*;
 
-declare_id!("2rxx7u9C5D5bMdjYmUz6LGkkfe6uwd2RPmgTVuidDW3B");
+declare_id!("56yAgYnBPorH5QMKJJroAm5182xMWvn6DLQazqBBJAHc");
 
 #[program]
 pub mod fee_manager {

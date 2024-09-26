@@ -7,7 +7,7 @@ mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
-declare_id!("GYtoknPePL58qaXtaRmp4annpnAvPrYcdvv9ghtbLKoL");
+declare_id!("5QKXZqqgUFMu4MwDSZTySPKVTiGQa8UL277RyUgggW1c");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";

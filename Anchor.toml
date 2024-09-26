@@ -1,15 +1,15 @@
 [toolchain]
 
 [features]
-seeds = false
+resolution = true
 skip-lint = false
 
 [programs.devnet]
-fee_manager = "2rxx7u9C5D5bMdjYmUz6LGkkfe6uwd2RPmgTVuidDW3B"
-govern_dapp = "4iYameyivGuoQjBWAzY5fvQiDLVxmfW2vVxGaw1mMNna"
-theia = "7AQNimfj3jURLjQzphNHySCBceLaFyAqtF2QcngKS17y"
-theia_router_config = "Gh327SmhfBRnfaYJwwC59h8vZs3psnAZWqQm1wXPuERq"
-theia_uuid_keeper = "6zEAEfszDLaJ463PVDz8raSYgGQR74gv4TTJh4BLJM4C"
+fee_manager = "56yAgYnBPorH5QMKJJroAm5182xMWvn6DLQazqBBJAHc"
+govern_dapp = "VSo8f94a5JPj3W7CBmwbRpXFa78r75YjpLEK9WJpedm"
+theia = "Dcvavuean23ijun4aG5Yxcespnfh15RHwdssjHuQFMkJ"
+theia_router_config = "6iPQR3hQs5o542GFftpLSvPnkCzhQScfKs2bssW7quqs"
+theia_uuid_keeper = "8CdrrYYkd2WGxUi5ydyd73iqmAQQXmRrUzSVxcKyhRku"
 
 [programs.localnet]
 c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
@@ -18,9 +18,8 @@ c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
-wallet = "/Users/davidkathoh/.config/solana/id.json"
+cluster = "Localnet"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
-
