@@ -14,9 +14,10 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
+idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
-anchor-lang = "0.29.0"
+anchor-lang = "0.30.1"
 theia_uuid_keeper = {path = "../theia_uuid_keeper", features =["cpi"]}
 c3caller_solana = {path = "../c3caller_solana", features =["cpi"]}
 
