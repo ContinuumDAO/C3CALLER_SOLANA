@@ -86,6 +86,7 @@ impl MintTheiaToken<'_>{
         let cpi_program = ctx.accounts.token_program.to_account_info();
         let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
         token::mint_to(cpi_ctx, amount)?;
+        
         Ok(())
     }
 
