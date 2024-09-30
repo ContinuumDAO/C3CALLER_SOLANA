@@ -7,7 +7,7 @@ mod utils;
 use crate::errors::C3CallerErros;
 use crate::events::*;
 use crate::states::*;
-declare_id!("5QKXZqqgUFMu4MwDSZTySPKVTiGQa8UL277RyUgggW1c");
+declare_id!("GwtL6McRr6Nd81acT7PjmuCsexmnr31vraZok4LB64V5");
 
 pub const C3UUID_KEEPER_SEED: &[u8] = b"c3uuidseed";
 pub const PAUSE_SEED: &[u8] = b"pauseseed";
@@ -201,7 +201,7 @@ fn check_owner(ctx: &Context<ExecuteState>)->Result<()>{
     
     Ok(())
 }
-#[event_cpi]
+
 #[derive(Accounts)]
 pub struct InitC3Caller<'info> {
     #[account(init,
@@ -229,7 +229,7 @@ pub struct InitC3Caller<'info> {
 
 }
 
-#[event_cpi]
+
 #[derive(Accounts)]
 pub struct C3CallerState<'info>{
     #[account()]
@@ -259,7 +259,7 @@ pub struct UpdateOwner<'info>{
     signer:Signer<'info>,
 }
 
-#[event_cpi]
+
 #[derive(Accounts)]
 pub struct ExecuteState<'info>{
     #[account()]

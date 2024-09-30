@@ -3,7 +3,7 @@ pub mod state;
 use crate::state::*;
 
 
-declare_id!("8CdrrYYkd2WGxUi5ydyd73iqmAQQXmRrUzSVxcKyhRku");
+declare_id!("2Cr9grBrvYfyJt2Lg1oj5J3d3wszHXZogmvR2vo4ynRz");
 
 #[program]
 pub mod theia_uuid_keeper {

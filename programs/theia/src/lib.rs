@@ -7,7 +7,6 @@ pub use states::*;
 
  use theia_uuid_keeper::cpi::accounts::GenerateUuid;
  use theia_uuid_keeper::program::TheiaUuidKeeper;
- use theia_uuid_keeper::Uuid2Nonce;
  use theia_uuid_keeper::CurrentNonce;
  use theia_uuid_keeper::state::EvmData;
  use c_3caller_solana::cpi::accounts::C3CallerState;
@@ -16,7 +15,7 @@ pub use states::*;
  use c_3caller_solana::states::OwnerKey;
  use c_3caller_solana::states::C3UUIDKeeper;
 
-declare_id!("Dcvavuean23ijun4aG5Yxcespnfh15RHwdssjHuQFMkJ");
+declare_id!("vBEVNQBYDoJSTf7U8zYjXoPQ85uFDXL25SuXb7ruE5n");
 
 #[program]
 pub mod theia {
@@ -166,8 +165,6 @@ pub mod theia {
             owner: ctx.accounts.owner_key.to_account_info(),
             c3_uuid: ctx.accounts.c3_uuid.to_account_info(),
             signer: ctx.accounts.payer.to_account_info(),
-            event_authority: ctx.accounts.payer.to_account_info(),
-            program: ctx.accounts.c3_caller.to_account_info(),
         });
 
         let res_caller = c_3caller_solana::cpi::ccall(
@@ -240,16 +237,16 @@ pub mod theia {
 
     let func_sign_theia = "0x3a1f8688";//"theiaVaultAuto(bytes32,address,address,uint256,uint256,uint256,address,address)";
 
-    let  call_data = Vec::new();
-    // call_data.extend_from_slice(func_sign_theia.as_bytes());
-    // call_data.extend_from_slice(&uuid);
-    // call_data.extend_from_slice(t.to_chain_addr.as_bytes());
-    // call_data.extend_from_slice(tc.receiver.as_bytes());
-    // call_data.extend_from_slice(&to_amount.to_le_bytes());
-    // call_data.extend_from_slice(&[t.to_chain_decimals]);
-    // call_data.extend_from_slice(&(liquidty_fee as u64).to_le_bytes());
-    // call_data.extend_from_slice(fee.to_chain_addr.as_bytes());
-    // call_data.extend_from_slice(t.addr.as_bytes());
+    let mut  call_data = Vec::new();
+    call_data.extend_from_slice(func_sign_theia.as_bytes());
+    call_data.extend_from_slice(&uuid);
+    call_data.extend_from_slice(t.to_chain_addr.as_bytes());
+    call_data.extend_from_slice(tc.receiver.as_bytes());
+    call_data.extend_from_slice(&to_amount.to_le_bytes());
+    call_data.extend_from_slice(&[t.to_chain_decimals]);
+    call_data.extend_from_slice(&(liquidty_fee as u64).to_le_bytes());
+    call_data.extend_from_slice(fee.to_chain_addr.as_bytes());
+    call_data.extend_from_slice(t.addr.as_bytes());
 
     call_data
 }
@@ -273,15 +270,20 @@ pub struct TheiaCrossNonEvm<'info>{
 pub struct TheiaCrossEvm<'info>{
   
     pub theia_uuid_keeper: Program<'info, TheiaUuidKeeper>,
- 
-    pub uuid_nonce: Account<'info, Uuid2Nonce>,
- 
+
+    /// CHECK: PDA checked in TheiaUuidKeepers
+      #[account(mut)]
+    pub uuid_nonce: UncheckedAccount<'info>,
+    #[account(mut)]
     pub current_nonce: Account<'info, CurrentNonce>,
     #[account(mut)]
     pub payer: Signer<'info>,
     pub c3_caller: Program<'info, C3callerSolana>,
+    #[account(mut)]
     pub c3_uuid: Account<'info, C3UUIDKeeper>,
+    #[account(mut)]
     pub pause: Account<'info, Pause>,
+    #[account(mut)]
     pub owner_key: Account<'info, OwnerKey>, 
     pub system_program: Program<'info, System>,
 }
@@ -289,12 +291,12 @@ pub struct TheiaCrossEvm<'info>{
 
 
 
-#[error_code]
-pub enum TheiaRouterError {
-    #[msg("Invalid input")]
-    InvalidInput,
-    // Add other error codes here...
-}
+// #[error_code]
+// pub enum TheiaRouterError {
+//     #[msg("Invalid input")]
+//     InvalidInput,
+//     // Add other error codes here...
+// }
 
 
 

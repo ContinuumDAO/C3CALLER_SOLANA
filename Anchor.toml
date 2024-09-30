@@ -5,14 +5,20 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-fee_manager = "56yAgYnBPorH5QMKJJroAm5182xMWvn6DLQazqBBJAHc"
-govern_dapp = "VSo8f94a5JPj3W7CBmwbRpXFa78r75YjpLEK9WJpedm"
-theia = "Dcvavuean23ijun4aG5Yxcespnfh15RHwdssjHuQFMkJ"
-theia_router_config = "6iPQR3hQs5o542GFftpLSvPnkCzhQScfKs2bssW7quqs"
-theia_uuid_keeper = "8CdrrYYkd2WGxUi5ydyd73iqmAQQXmRrUzSVxcKyhRku"
+c3caller_solana = "9PyZTQouU1pADcxEJ1fQqv9bhKTqEHuhrHbFv3csDvWr"
+fee_manager = "CSymf8F2JmZ3Hk2wn42SfxfXJiPgs9u5529vVNBg5EXg"
+govern_dapp = "CSswTE63tKXCvxg4kpFTG6FZBtL6CBmzfxoL48fmcbAb"
+theia = "vBEVNQBYDoJSTf7U8zYjXoPQ85uFDXL25SuXb7ruE5n"
+theia_router_config = "2HJ1fdTUy1itAGc4XYsoygZQJi3tTqHoDUfx8n3dGD1J"
+theia_uuid_keeper = "2Cr9grBrvYfyJt2Lg1oj5J3d3wszHXZogmvR2vo4ynRz"
 
 [programs.localnet]
-c3caller_solana = "HhXT6ksusxp1xswkvxdBHeBya4CihrKUzyav8FK863Vs"
+c3caller_solana = "9PyZTQouU1pADcxEJ1fQqv9bhKTqEHuhrHbFv3csDvWr"
+fee_manager = "AYHjdke7BREBaXqTXyDV5jd2WYnBGxwHYeNvhp33Kpcd"
+govern_dapp = "En923mkvSaX553qXjruxkVSYotAfcVVAHwuFawAeK768"
+theia = "Ch1kB76C6HQMVN6ndcT47DypPbQCWtwqKeWUw2d9mkMf"
+theia_router_config = "9sefb5bePR8neVMrqoA7w1aZYALmzdnReksccvriKiLE"
+theia_uuid_keeper = "Dr5Mi7cwhkj5NyVY4XJQ2eiGM96LY3pE39WLFDJUJBTp"
 
 [registry]
 url = "https://api.apr.dev"

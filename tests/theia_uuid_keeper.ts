@@ -12,7 +12,7 @@ describe("theiaUUIDKeeper", () => {
    
     const program =  anchor.workspace.TheiaUuidKeeper as Program<TheiaUuidKeeper>
 
-    const CURRENT_NONCE_SEED = Buffer.from("setpauseseed");
+    const CURRENT_NONCE_SEED = Buffer.from("current_nonce");
     const [currentNonceAccount,_bump] = anchor.web3.PublicKey.findProgramAddressSync(
       [CURRENT_NONCE_SEED],
       program.programId
@@ -33,14 +33,14 @@ describe("theiaUUIDKeeper", () => {
     it("generate UUID", async()=>{
 
         
-        const currentNoncePda = await program.account.currentNonce.fetch(currentNonceAccount);
+        const  currentNoncePda = await program.account.currentNonce.fetch(currentNonceAccount);
          const currentNonce = currentNoncePda.nonce;
     
        // 3. Calculate the PDA for the uuid_nonce account
         const [uuidNoncePDA, _] = anchor.web3.PublicKey.findProgramAddressSync(
           [
             Buffer.from("uuid_nonce"),
-            Buffer.from((currentNonce.add(new anchor.BN(1))).toString())
+            Buffer.from((currentNonce.add(new anchor.BN(1)).toArrayLike(Buffer, 'be', 8)))
           ],
           program.programId
         );
