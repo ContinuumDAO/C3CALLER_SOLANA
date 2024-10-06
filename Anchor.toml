@@ -17,6 +17,7 @@ c3caller_solana = "9PyZTQouU1pADcxEJ1fQqv9bhKTqEHuhrHbFv3csDvWr"
 fee_manager = "AYHjdke7BREBaXqTXyDV5jd2WYnBGxwHYeNvhp33Kpcd"
 govern_dapp = "En923mkvSaX553qXjruxkVSYotAfcVVAHwuFawAeK768"
 theia = "Ch1kB76C6HQMVN6ndcT47DypPbQCWtwqKeWUw2d9mkMf"
+theia_config = "HEQ8Ba4iBt9WGZkNG62fCBs21LkaNiTo65qh4AVDPEBN"
 theia_router_config = "9sefb5bePR8neVMrqoA7w1aZYALmzdnReksccvriKiLE"
 theia_uuid_keeper = "Dr5Mi7cwhkj5NyVY4XJQ2eiGM96LY3pE39WLFDJUJBTp"
 

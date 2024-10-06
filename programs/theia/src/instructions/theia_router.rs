@@ -1,34 +1,40 @@
-use crate::*;
-#[account]
-pub struct TheiaRouter {
-    pub w_native: Pubkey,
-    pub uuid_keeper: Pubkey,
-    pub theia_config: Pubkey,
-    pub fee_manager: Pubkey,
-    pub gov: Pubkey,
-    pub c3caller_proxy: Pubkey,
-    pub tx_senders: Vec<Pubkey>,
-    pub dapp_id: u64,
-    pub bump: u8,
+#[derive(Accounts)]
+pub struct TheiaCrossEvm<'info>{
+  
+    pub theia_uuid_keeper: Program<'info, TheiaUuidKeeper>,
+
+    /// CHECK: PDA checked in TheiaUuidKeepers
+      #[account(mut)]
+    pub uuid_nonce: UncheckedAccount<'info>,
+    #[account(mut)]
+    pub current_nonce: Account<'info, CurrentNonce>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    pub c3_caller: Program<'info, C3callerSolana>,
+    #[account(mut)]
+    pub c3_uuid: Account<'info, C3UUIDKeeper>,
+    #[account(mut)]
+    pub pause: Account<'info, Pause>,
+    #[account(mut)]
+    pub owner_key: Account<'info, OwnerKey>, 
+    pub system_program: Program<'info, System>,
 }
 
-impl TheiaRouter {
-    pub const MAX_SIZE: usize = 32 * 6 + 32 * 10 + 8 + 1 + 200; // Adjust this value based on your needs
+impl TheiaCrossEvm{
 
-    pub fn get_liquidity(&self, token: Pubkey) -> Result<(u64, u8)> {
-        // Implement get_liquidity logic here
-        Ok((0, 0))
+    pub fn get_rev_amount(ctx: &mut Context<TheiaCrossEvm>,amount:u64)->Result<()> {
+
+
     }
 
-    pub fn query_liquidity_fee_rate(&self, theia_token: Pubkey, amount: u64) -> Result<u64> {
-        // Implement query_liquidity_fee_rate logic here
-        Ok(0)
+    fn transfer_native(ctx: &mut Context<TheiaCrossEvm>, amount:u64)->Result<()>{
+
+
     }
 
-    pub fn get_base_liquidity_fee(&self, theia_token: Pubkey) -> Result<u64> {
-        // Implement get_base_liquidity_fee logic here
-        Ok(0)
-    }
+    fn transfer_underlying(ctx: &mut Context<TheiaCrossEvm>, amount:u64)->Result<()>{
 
-    // Add other helper functions here...
+
+    }
+    
 }
