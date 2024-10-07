@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 pub mod events;
+mod states;
 use events::*;
+use states::{FromFeeConfig, ToFeeConfig};
 
 declare_id!("CSymf8F2JmZ3Hk2wn42SfxfXJiPgs9u5529vVNBg5EXg");
 
@@ -392,6 +394,44 @@ pub struct Initialize<'info> {
 //     pub high_gas_fee: u64,
 //     pub very_high_gas_fee: u64,
 // }
+
+#[derive(Accounts)]
+#[instruction(chain_id:u64,token_addr:String)]
+pub struct SetFromFeeConfig<'info>{
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = 8+ FromFeeConfig::INIT_SPACE,
+        seeds = [&chain_id.to_be_bytes(), token_addr.as_bytes()],
+        bump
+
+    )]
+    pub fee_config:Account<'info,FromFeeConfig>,
+    pub  system_program:Program<'info,System>
+}
+
+#[derive(Accounts)]
+#[instruction(chain_id:u64,token_addr:String)]
+pub struct SetToFeeConfig<'info>{
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = 8+ FromFeeConfig::INIT_SPACE,
+        seeds = [&chain_id.to_be_bytes(), token_addr.as_bytes()],
+        bump
+
+    )]
+    pub fee_config:Account<'info,ToFeeConfig>,
+    pub  system_program:Program<'info,System>
+}
 
 #[error_code]
 pub enum FeeManagerError {
