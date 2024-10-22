@@ -1,8 +1,10 @@
 mod states;
 mod events;
+mod instructions;
+mod state;
 
 use anchor_lang::prelude::*;
-use states::{TokenConfig, TokenIDMap, TokenIdList, TokenInfo};
+use state::*;
 
 declare_id!("2HJ1fdTUy1itAGc4XYsoygZQJi3tTqHoDUfx8n3dGD1J");
 
@@ -40,8 +42,7 @@ pub mod theia_router_config {
         ctx.accounts.token_config.router_contract = routeur_contract.clone();
         ctx.accounts.token_config.extra = underlying;
             
-        ctx.accounts.token_ids_map.is_valid = true;
-        ctx.accounts.token_list.token_ids.push(token_id.clone());
+    
 
 
         emit!(LogSetTokenConfig{
@@ -69,53 +70,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[derive(Accounts)]
-#[instruction(token_id:String, chain_id:u64)]
-pub struct  SetTokenConfig<'info>{
 
-    #[account(mut)]
-    pub signer:Signer<'info>,
-    #[account(
-        init,
-        payer = signer,
-        space =  8 + TokenConfig::INIT_SPACE,
-        seeds = [token_id.as_bytes(), &chain_id.to_le_bytes()],
-        bump,
-    )]
-    pub token_config:Account<'info,TokenConfig>,
-
-    #[account(
-        init,
-        payer = signer,
-        space = 8+ TokenIDMap::INIT_SPACE,
-        seeds = [&chain_id.to_be_bytes()],
-        bump,
-    )]
-    pub token_ids_map:Account<'info,TokenIDMap>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = 8+ 1024, // todo fix space
-        seeds = [b"token list"],
-        bump,
-
-    )]
-    pub token_list:Account<'info,TokenIdList>,
-
-    pub system_program:Program<'info,System>
-
-}
-
-#[derive(Accounts)]
-#[instruction(token_id: String, chain_id: u64)]
-pub struct GetTokenConfig<'info> {
-    #[account(
-        seeds = [token_id.as_bytes(), &chain_id.to_le_bytes()],
-        bump,
-    )]
-    pub token_config: Account<'info, TokenConfig>,
-}
 
 
 
