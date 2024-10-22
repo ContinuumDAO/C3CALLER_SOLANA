@@ -20,6 +20,34 @@ pub mod fee_manager {
         Ok(())
     }
 
+
+    pub  fn set_fee_config(ctx: Context<SetFromFeeConfig>,src_chain_id:u64,
+         dst_chain_id:u64,
+          pay_from:u8, addresses:Vec<String>, fee:Vec<u64>)->Result<()>{
+
+
+            require!(src_chain_id > 0 || dst_chain_id > 0, "FM: ChainID empty");
+            require!(addresses.len() == fee.len(), "FM: Invalid list size");
+            require!(pay_from == 1 || pay_from == 2, "FM: Invalid payFrom");
+            
+          
+
+            for i in 0 .. fee.len()  {
+
+                if pay_from == 1 {
+                    ctx.accounts.fee_config.fee = fee[i];
+                }else if pay_from == 2 {
+                    ctx.accounts.fee_config.fee = fee[i];
+
+                }
+                
+            }
+      
+    
+        Ok(())
+
+    }
+
     // pub fn add_fee_token(ctx: Context<AddFeeToken>, fee_token: Pubkey) -> Result<()> {
     //     let fee_manager = &mut ctx.accounts.fee_manager;
     //     require!(!fee_manager.fee_token_list.contains(&fee_token), FeeManagerError::TokenAlreadyExists);
