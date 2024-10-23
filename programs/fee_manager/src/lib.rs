@@ -26,9 +26,10 @@ pub mod fee_manager {
           pay_from:u8, addresses:Vec<String>, fee:Vec<u64>)->Result<()>{
 
 
-            require!(src_chain_id > 0 || dst_chain_id > 0, "FM: ChainID empty");
-            require!(addresses.len() == fee.len(), "FM: Invalid list size");
-            require!(pay_from == 1 || pay_from == 2, "FM: Invalid payFrom");
+            // require!(src_chain_id > 0 || dst_chain_id > 0, "FM: ChainID empty");
+            // require!(addresses.len() == fee.len(), "FM: Invalid list size");
+            // require!(pay_from == 1 || pay_from == 2, "FM: Invalid payFrom");
+
             
           
 

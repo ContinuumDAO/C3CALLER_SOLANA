@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use crate::*;
 #[account]
 #[derive(InitSpace)]
 pub struct TokenConfig {
