@@ -19,10 +19,9 @@ impl GetTokenConfig<'_> {
     }
 
 
-    // pub fn get_token_config_if_exist(ctx: &mut Context<GetTokenConfig>,params: &GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
+    // pub fn get_token_config_if_exist(&mut self,params: &GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
 
 
-    //     Ok(())
     // }
     
 }
