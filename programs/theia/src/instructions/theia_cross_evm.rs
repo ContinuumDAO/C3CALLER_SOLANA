@@ -47,7 +47,17 @@ impl  TheiaCrossEvm<'_> {
 
 
 
+
+    fn calc_and_pay(&mut self)->u64{
+
+
+
+        12_u64
+    }
     fn get_rev_amount(&mut self)->u64{
+
+         
+
 
 
         65_u64
