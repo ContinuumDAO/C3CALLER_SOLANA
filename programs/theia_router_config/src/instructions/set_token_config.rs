@@ -21,14 +21,14 @@ pub struct  SetTokenConfig<'info>{
 
 impl SetTokenConfig<'_> {
 
-    pub fn apply(ctx: &mut Context<SetTokenConfig>, params: &SetTokenConfigParams)->Result<()>{
+    pub fn apply(&mut self, params: &SetTokenConfigParams)->Result<()>{
 
-        ctx.accounts.token_config.chain_id = params.chain_id;
-        ctx.accounts.token_config.decimals = params.decimals;
-        ctx.accounts.token_config.contract_version = params.contract_version;
-        ctx.accounts.token_config.contract_address = params.token_addr.clone();
-        ctx.accounts.token_config.router_contract = params.routeur_contract.clone();
-        ctx.accounts.token_config.extra = params.underlying.clone();
+        self.token_config.chain_id = params.chain_id;
+        self.token_config.decimals = params.decimals;
+        self.token_config.contract_version = params.contract_version;
+        self.token_config.contract_address = params.token_addr.clone();
+        self.token_config.router_contract = params.routeur_contract.clone();
+        self.token_config.extra = params.underlying.clone();
             
         emit!(LogSetTokenConfig{
             chain_id: params.chain_id,

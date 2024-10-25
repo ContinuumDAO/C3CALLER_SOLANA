@@ -13,17 +13,16 @@ declare_id!("2HJ1fdTUy1itAGc4XYsoygZQJi3tTqHoDUfx8n3dGD1J");
 pub mod theia_router_config {
     use super::*;
 
-    pub fn token_config(mut ctx: Context<GetTokenConfig>,params:GetTokenConfigParams)-> Result<TokenConfig>{
-       GetTokenConfig::apply(&mut ctx, &params)
+    pub fn get_token_config(ctx: Context<GetTokenConfig>,params:GetTokenConfigParams)-> Result<TokenConfig>{
+            ctx.accounts.apply(&params)
     }
-    pub fn set_token_config(mut ctx:Context<SetTokenConfig>,params:SetTokenConfigParams )-> Result<()>{
-        SetTokenConfig::apply(&mut ctx, &params)
+    pub fn set_token_config(ctx:Context<SetTokenConfig>,params:SetTokenConfigParams )-> Result<()>{
+        ctx.accounts.apply(&params)
     }
 
-    pub fn get_token_config_if_exist(mut ctx: Context<GetTokenConfig>,params:GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
-
-        let c = GetTokenConfig::apply(&mut ctx, &params)?;
-        let tc = GetTokenConfig::apply(&mut ctx, &params)?;
+    pub fn get_token_config_if_exist(ctx: Context<GetTokenConfig>,params:GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
+        let c =  ctx.accounts.apply(&params)?;
+        let tc =  ctx.accounts.apply(&params)?;
         Ok((c,tc))
     }
 

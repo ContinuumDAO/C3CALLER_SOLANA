@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 mod events;
 mod states;
 mod errors;
+mod instructions;
 pub use events::*;
 pub use states::*;
 
@@ -58,7 +59,7 @@ pub mod theia {
             to_chain_addr: "".to_string(), // Replace with actual to_chain_addr
             to_chain_decimals: 8, // Replace with actual to_chain_decimals
         };
-        let cpi_ctx = CpiContext::new(ctx.accounts.theia_uuid_keeper.to_account_info(), GenerateUuid{
+        let uuid_cpi_ctx = CpiContext::new(ctx.accounts.theia_uuid_keeper.to_account_info(), GenerateUuid{
             uuid_nonce: ctx.accounts.uuid_nonce.to_account_info(),
             payer: ctx.accounts.payer.to_account_info(),
             current_nonce: ctx.accounts.current_nonce.to_account_info(),
@@ -66,22 +67,16 @@ pub mod theia {
         });
 
 
-
-
-        let uuid:[u8;32];
-        let res = theia_uuid_keeper::cpi::gen_uuid_evm(cpi_ctx, EvmData {
+        let uuid = theia_uuid_keeper::cpi::gen_uuid_evm(uuid_cpi_ctx, EvmData {
             token: t.addr,
             from: ctx.accounts.payer.key().to_string(),
             amount: recv_amount,
             receiver: params.receiver.clone(),
             to_chain_id: params.to_chain_id,
-        });
+        })?.get();
 
         
-        match res {
-            Ok(_uuid) => uuid = _uuid.get(),
-            Err(_) => return err!(errors::TheiaError::GenUUIDCPIFailed),
-        }
+        
             
         
        
@@ -240,27 +235,7 @@ pub struct TheiaCrossNonEvm<'info>{
     pub system_program: Program<'info, System>,
 }
 
-#[derive(Accounts)]
-pub struct TheiaCrossEvm<'info>{
-  
-    pub theia_uuid_keeper: Program<'info, TheiaUuidKeeper>,
 
-    /// CHECK: PDA checked in TheiaUuidKeepers
-      #[account(mut)]
-    pub uuid_nonce: UncheckedAccount<'info>,
-    #[account(mut)]
-    pub current_nonce: Account<'info, CurrentNonce>,
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    pub c3_caller: Program<'info, C3callerSolana>,
-    #[account(mut)]
-    pub c3_uuid: Account<'info, C3UUIDKeeper>,
-    #[account(mut)]
-    pub pause: Account<'info, Pause>,
-    #[account(mut)]
-    pub owner_key: Account<'info, OwnerKey>, 
-    pub system_program: Program<'info, System>,
-}
 
 
 

@@ -13,9 +13,8 @@ pub struct  GetTokenConfig <'info>{
 }
 
 impl GetTokenConfig<'_> {
-    pub fn apply(ctx: &mut Context<GetTokenConfig>, params: &GetTokenConfigParams)->Result<TokenConfig>{
-        let token_config = &ctx.accounts.token_config;
-        
+    pub fn apply(&mut self,_: &GetTokenConfigParams)->Result<TokenConfig>{
+        let token_config = &self.token_config;
         Ok(TokenConfig { chain_id: token_config.chain_id, decimals: token_config.decimals, contract_address: token_config.contract_address.clone(), contract_version: token_config.contract_version, router_contract: token_config.router_contract.clone(), extra: token_config.extra.clone() })
     }
 
