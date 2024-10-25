@@ -1653,6 +1653,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "c3caller_solana",
+ "fee_manager",
  "theia_router_config",
  "theia_uuid_keeper",
 ]
