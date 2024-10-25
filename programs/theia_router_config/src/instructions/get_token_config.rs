@@ -18,6 +18,13 @@ impl GetTokenConfig<'_> {
         
         Ok(TokenConfig { chain_id: token_config.chain_id, decimals: token_config.decimals, contract_address: token_config.contract_address.clone(), contract_version: token_config.contract_version, router_contract: token_config.router_contract.clone(), extra: token_config.extra.clone() })
     }
+
+
+    // pub fn get_token_config_if_exist(ctx: &mut Context<GetTokenConfig>,params: &GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
+
+
+    //     Ok(())
+    // }
     
 }
 

@@ -20,6 +20,13 @@ pub mod theia_router_config {
         SetTokenConfig::apply(&mut ctx, &params)
     }
 
+    pub fn get_token_config_if_exist(mut ctx: Context<GetTokenConfig>,params:GetTokenConfigParams)->Result<(TokenConfig,TokenConfig)>{
+
+        let c = GetTokenConfig::apply(&mut ctx, &params)?;
+        let tc = GetTokenConfig::apply(&mut ctx, &params)?;
+        Ok((c,tc))
+    }
+
 }
 
 
